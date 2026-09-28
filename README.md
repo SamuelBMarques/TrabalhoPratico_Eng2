@@ -77,28 +77,6 @@ O **Sistema de Reserva de Quadras** é uma aplicação em que:
 
 ---
 
-## 📝 Histórias de usuário
-
-| ID | História | Descrição |
-|---|---|---|
-| **US01** | Cadastro de usuário | Como usuário, quero criar uma conta no sistema, para poder realizar reservas de quadras. |
-| **US02** | Login | Como usuário, quero entrar no sistema com meu e-mail e senha, para acessar minhas funcionalidades. |
-| **US03** | Visualizar quadras | Como usuário, quero visualizar as quadras disponíveis, para escolher onde quero jogar. |
-| **US04** | Consultar horários | Como usuário, quero consultar os horários disponíveis de uma quadra, para escolher um horário adequado. |
-| **US05** | Realizar reserva | Como usuário, quero reservar uma quadra em uma data e horário, para garantir aquele horário para meu uso. |
-| **US06** | Confirmar reserva | Como usuário, quero receber a confirmação da minha reserva, para ter certeza de que o agendamento foi realizado. |
-| **US07** | Cancelar reserva | Como usuário, quero cancelar uma reserva, para liberar o horário caso eu não possa comparecer. |
-| **US08** | Visualizar minhas reservas | Como usuário, quero visualizar minhas reservas, para acompanhar meus agendamentos. |
-| **US09** | Alterar reserva | Como usuário, quero alterar a data ou o horário de uma reserva, para adequá-la à minha disponibilidade. |
-| **US10** | Gerenciar quadras | Como administrador, quero cadastrar, editar e remover quadras, para manter as quadras disponíveis no sistema atualizadas. |
-| **US11** | Gerenciar horários | Como administrador, quero definir os horários disponíveis para cada quadra, para controlar os períodos de funcionamento. |
-| **US12** | Gerenciar reservas | Como administrador, quero visualizar e gerenciar todas as reservas, para organizar o uso das quadras. |
-| **US13** | Bloquear horário | Como administrador, quero bloquear horários de uma quadra, para impedir reservas durante manutenção ou eventos. |
-| **US14** | Histórico de reservas | Como usuário, quero consultar o histórico das minhas reservas, para saber quais quadras e horários já utilizei. |
-| **US15** | Notificação | Como usuário, quero receber notificações sobre minhas reservas, para ser informado sobre confirmações, alterações ou cancelamentos. |
-
----
-
 ## 👨‍💻 Integrantes da equipe
 
 | Nome |
@@ -107,6 +85,7 @@ O **Sistema de Reserva de Quadras** é uma aplicação em que:
 | Kayo Xavier |
 | Matheus Cardoso |
 | Pedro Souza |
+| Pedro Boseja |
 | Samuel Marques |
 
 ---
