@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# Configurações locais e segredos
+.env
+.env.*
+!.env.example
+
+# Banco local e arquivos gerados
+*.sqlite3
+staticfiles/
+media/
+
+# Testes e cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editores e sistema operacional
+.DS_Store
+.idea/
+.vscode/
