@@ -1,0 +1,75 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Criar conta | Reserva de Quadras</title>
+    <link rel="stylesheet" href="{% static 'usuarios/cadastro.css' %}">
+</head>
+<body>
+    <main class="pagina">
+        <section class="cartao-cadastro" aria-labelledby="titulo-cadastro">
+            <p class="marca">RESERVA DE QUADRAS</p>
+            <h1 id="titulo-cadastro">Crie sua conta</h1>
+            <p class="descricao">Cadastre-se para acompanhar suas reservas de quadras.</p>
+
+            {% if messages %}
+                <div class="mensagens" aria-live="polite">
+                    {% for message in messages %}
+                        <p class="mensagem sucesso">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if form.non_field_errors %}
+                <div class="mensagem erro" role="alert">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'usuarios:cadastro' %}">
+                {% csrf_token %}
+
+                <div class="campo">
+                    <label for="{{ form.nome.id_for_label }}">{{ form.nome.label }}</label>
+                    {{ form.nome }}
+                    {% for erro in form.nome.errors %}
+                        <p class="erro-campo" role="alert">{{ erro }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="campo">
+                    <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                    {{ form.email }}
+                    {% for erro in form.email.errors %}
+                        <p class="erro-campo" role="alert">{{ erro }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="campo">
+                    <label for="{{ form.senha.id_for_label }}">{{ form.senha.label }}</label>
+                    {{ form.senha }}
+                    {% if form.senha.help_text %}
+                        <small class="ajuda">{{ form.senha.help_text }}</small>
+                    {% endif %}
+                    {% for erro in form.senha.errors %}
+                        <p class="erro-campo" role="alert">{{ erro }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="campo">
+                    <label for="{{ form.confirmar_senha.id_for_label }}">{{ form.confirmar_senha.label }}</label>
+                    {{ form.confirmar_senha }}
+                    {% for erro in form.confirmar_senha.errors %}
+                        <p class="erro-campo" role="alert">{{ erro }}</p>
+                    {% endfor %}
+                </div>
+
+                <button type="submit">Criar conta</button>
+            </form>
+            <p class="nota">Seus dados serão usados para identificar suas reservas.</p>
+        </section>
+    </main>
+</body>
+</html>
