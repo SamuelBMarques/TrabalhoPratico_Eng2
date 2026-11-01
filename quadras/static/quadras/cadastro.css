@@ -1,0 +1,313 @@
+:root {
+    --roxo: #3d2c8d;
+    --roxo-escuro: #1f1650;
+    --laranja: #f6a623;
+    --laranja-escuro: #d98a0b;
+    --azul: #6ec6ef;
+    --tinta: #1b1830;
+    --tinta-suave: #5d5a72;
+    --linha: #dcd9ea;
+    --fundo: #f6f4fb;
+    --branco: #ffffff;
+    --erro: #c4314b;
+    --sucesso: #1d7a52;
+    font-family: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--tinta);
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--fundo);
+}
+
+.tela {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    min-height: 100vh;
+}
+
+/* ---------- lado da foto ---------- */
+
+.vitrine {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 56px;
+    background:
+        linear-gradient(180deg, rgba(31, 22, 80, 0.15) 0%, rgba(31, 22, 80, 0.55) 45%, rgba(31, 22, 80, 0.95) 100%),
+        var(--foto) center / cover no-repeat;
+    color: var(--branco);
+    overflow: hidden;
+}
+
+/* faixa laranja lembrando a linha da quadra */
+.vitrine::after {
+    content: "";
+    position: absolute;
+    left: 56px;
+    top: 0;
+    width: 6px;
+    height: 120px;
+    background: var(--laranja);
+}
+
+.vitrine-conteudo {
+    position: relative;
+    max-width: 460px;
+}
+
+.selo {
+    display: inline-block;
+    margin: 0 0 20px;
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.vitrine h1 {
+    margin: 0;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: clamp(3.5rem, 7vw, 6.5rem);
+    font-weight: 800;
+    line-height: 0.88;
+    text-transform: uppercase;
+}
+
+.vitrine h1::after {
+    content: "";
+    display: block;
+    width: 72px;
+    height: 6px;
+    margin-top: 20px;
+    background: var(--azul);
+}
+
+.vitrine-texto {
+    margin: 20px 0 0;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- lado do formulario ---------- */
+
+.painel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    max-width: 560px;
+    padding: 56px 48px;
+}
+
+.painel-topo { margin-bottom: 28px; }
+
+.passo {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--roxo);
+}
+
+.painel-topo h2 {
+    margin: 4px 0 0;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.aviso {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    border-left: 4px solid;
+    font-weight: 500;
+}
+
+.aviso p { margin: 0; }
+.aviso ul { margin: 0; padding-left: 18px; }
+
+.aviso-sucesso {
+    border-color: var(--sucesso);
+    background: #e6f4ed;
+    color: var(--sucesso);
+}
+
+.aviso-erro {
+    border-color: var(--erro);
+    background: #fbe9ec;
+    color: var(--erro);
+}
+
+.bloco {
+    margin: 0 0 24px;
+    padding: 0;
+    border: 0;
+}
+
+.bloco legend {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 0;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tinta-suave);
+}
+
+.bloco legend::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--linha);
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.campo label,
+.rotulo {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.campo input[type="text"],
+.campo input[type="time"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--linha);
+    border-radius: 6px;
+    background: var(--branco);
+    color: var(--tinta);
+    font: inherit;
+    font-size: 1rem;
+    transition: border-color 0.15s;
+}
+
+.campo input:focus {
+    outline: none;
+    border-color: var(--roxo);
+}
+
+.erro {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--erro);
+}
+
+.horarios {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: start;
+    gap: 12px;
+}
+
+.seta {
+    padding-top: 36px;
+    font-size: 1.25rem;
+    color: var(--tinta-suave);
+}
+
+/* dias como botoes que acendem quando marcados */
+.dias {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.dia {
+    position: relative;
+    cursor: pointer;
+}
+
+.dia input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.dia span {
+    display: block;
+    padding: 12px 0;
+    border: 2px solid var(--linha);
+    border-radius: 6px;
+    background: var(--branco);
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--tinta-suave);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.dia:hover span { border-color: var(--roxo); }
+
+.dia input:checked + span {
+    border-color: var(--roxo);
+    background: var(--roxo);
+    color: var(--branco);
+}
+
+.dia input:focus-visible + span {
+    outline: 3px solid var(--azul);
+    outline-offset: 2px;
+}
+
+.botao {
+    width: 100%;
+    padding: 16px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--laranja);
+    color: var(--roxo-escuro);
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.botao:hover { background: var(--laranja-escuro); }
+.botao:active { transform: translateY(1px); }
+
+/* ---------- celular e tela estreita ---------- */
+
+@media (max-width: 860px) {
+    .tela { grid-template-columns: 1fr; }
+
+    .vitrine {
+        min-height: 300px;
+        padding: 32px 16px;
+    }
+
+    .vitrine::after { display: none; }
+
+    .vitrine-texto { font-size: 1rem; }
+
+    .painel {
+        max-width: none;
+        padding: 32px 16px 48px;
+    }
+
+    .dias { gap: 4px; }
+    .dia span { font-size: 0.9rem; padding: 10px 0; }
+}
