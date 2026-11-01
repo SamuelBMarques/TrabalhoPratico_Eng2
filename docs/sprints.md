@@ -6,6 +6,7 @@
 | ... | Product Owner |
 | ... | Scrum Master |
 | Samuel | Desenvolvedor |
+| Pedro Souza | Desenvolvedor |
 
 ## 2. Calendário e Milestones
 | Sprint | Início | Fim | Objetivo | Milestone |
@@ -25,9 +26,9 @@ Todos os milestones: <https://github.com/SamuelBMarques/TrabalhoPratico_Eng2/mil
 | H01 | Implementar o cadastro no banco de dados | Samuel | #31 |
 | H01 | Criar a tela de cadastro | Samuel | #32 |
 | H01 | Testar o cadastro e a validação dos dados | ... | #33 |
-| H10 | Implementar o cadastro de quadras | ... | #26 |
-| H10 | Implementar a edição de quadras | ... | #27 |
-| H10 | Implementar a exclusão ou desativação de quadras | ... | #28 |
+| H10 | Implementar o cadastro de quadras | Pedro Souza | #26 |
+| H10 | Implementar a edição de quadras | Pedro Souza | #27 |
+| H10 | Implementar a exclusão ou desativação de quadras | Pedro Souza | #28 |
 | H10 | Criar a interface de gerenciamento de quadras | ... | #34 |
 | H10 | Testar o gerenciamento de quadras | ... | #29 |
 | H11 | Definir os dados dos horários | ... | #18 |
