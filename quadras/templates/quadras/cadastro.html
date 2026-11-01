@@ -1,0 +1,112 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nova quadra | Reserva de Quadras</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="{% static 'quadras/cadastro.css' %}">
+</head>
+<body>
+    <main class="tela">
+        <aside class="vitrine" style="--foto: url('{% static 'quadras/img/quadra-futsal.webp' %}')">
+            <div class="vitrine-conteudo">
+                <p class="selo">Reserva de Quadras</p>
+                <h1>Nova<br>quadra</h1>
+                <p class="vitrine-texto">Cadastre o espaço, defina quando ele abre e deixe a galera reservar sem conflito de horário.</p>
+            </div>
+        </aside>
+
+        <section class="painel" aria-labelledby="titulo-form">
+            <header class="painel-topo">
+                <span class="passo">Cadastro</span>
+                <h2 id="titulo-form">Dados da quadra</h2>
+            </header>
+
+            {% if messages %}
+                <div class="aviso aviso-sucesso" aria-live="polite">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if form.non_field_errors %}
+                <div class="aviso aviso-erro" role="alert">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <form method="post" action="{% url 'quadras:cadastro' %}" novalidate>
+                {% csrf_token %}
+
+                <fieldset class="bloco">
+                    <legend>Identificação</legend>
+
+                    <div class="campo">
+                        <label for="{{ form.nome.id_for_label }}">{{ form.nome.label }}</label>
+                        {{ form.nome }}
+                        {% for erro in form.nome.errors %}
+                            <p class="erro" role="alert">{{ erro }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="campo">
+                        <label for="{{ form.tipo.id_for_label }}">{{ form.tipo.label }}</label>
+                        {{ form.tipo }}
+                        <datalist id="sugestoes-tipo">
+                            <option value="Poliesportiva">
+                            <option value="Futsal">
+                            <option value="Vôlei">
+                            <option value="Basquete">
+                        </datalist>
+                        {% for erro in form.tipo.errors %}
+                            <p class="erro" role="alert">{{ erro }}</p>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+
+                <fieldset class="bloco">
+                    <legend>Funcionamento</legend>
+
+                    <div class="horarios">
+                        <div class="campo">
+                            <label for="{{ form.horario_abertura.id_for_label }}">{{ form.horario_abertura.label }}</label>
+                            {{ form.horario_abertura }}
+                            {% for erro in form.horario_abertura.errors %}
+                                <p class="erro" role="alert">{{ erro }}</p>
+                            {% endfor %}
+                        </div>
+                        <span class="seta" aria-hidden="true">→</span>
+                        <div class="campo">
+                            <label for="{{ form.horario_fechamento.id_for_label }}">{{ form.horario_fechamento.label }}</label>
+                            {{ form.horario_fechamento }}
+                            {% for erro in form.horario_fechamento.errors %}
+                                <p class="erro" role="alert">{{ erro }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <span class="rotulo" id="rotulo-dias">{{ form.dias_funcionamento.label }}</span>
+                        <div class="dias" role="group" aria-labelledby="rotulo-dias">
+                            {% for opcao in form.dias_funcionamento %}
+                                <label class="dia" title="{{ opcao.choice_label }}">
+                                    {{ opcao.tag }}
+                                    <span>{{ opcao.choice_label|slice:":3" }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                        {% for erro in form.dias_funcionamento.errors %}
+                            <p class="erro" role="alert">{{ erro }}</p>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+
+                <button type="submit" class="botao">Cadastrar quadra</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

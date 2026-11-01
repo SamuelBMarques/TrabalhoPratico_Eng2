@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "usuarios.apps.UsuariosConfig",
+    "quadras.apps.QuadrasConfig",
 ]
 
 MIDDLEWARE = [
