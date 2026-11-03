@@ -1,0 +1,62 @@
+<fieldset class="bloco">
+    <legend>Identificação</legend>
+
+    <div class="campo">
+        <label for="{{ form.nome.id_for_label }}">{{ form.nome.label }}</label>
+        {{ form.nome }}
+        {% for erro in form.nome.errors %}
+            <p class="erro" role="alert">{{ erro }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="campo">
+        <label for="{{ form.tipo.id_for_label }}">{{ form.tipo.label }}</label>
+        {{ form.tipo }}
+        <datalist id="sugestoes-tipo">
+            <option value="Poliesportiva">
+            <option value="Futsal">
+            <option value="Vôlei">
+            <option value="Basquete">
+        </datalist>
+        {% for erro in form.tipo.errors %}
+            <p class="erro" role="alert">{{ erro }}</p>
+        {% endfor %}
+    </div>
+</fieldset>
+
+<fieldset class="bloco">
+    <legend>Funcionamento</legend>
+
+    <div class="horarios">
+        <div class="campo">
+            <label for="{{ form.horario_abertura.id_for_label }}">{{ form.horario_abertura.label }}</label>
+            {{ form.horario_abertura }}
+            {% for erro in form.horario_abertura.errors %}
+                <p class="erro" role="alert">{{ erro }}</p>
+            {% endfor %}
+        </div>
+        <span class="seta" aria-hidden="true">→</span>
+        <div class="campo">
+            <label for="{{ form.horario_fechamento.id_for_label }}">{{ form.horario_fechamento.label }}</label>
+            {{ form.horario_fechamento }}
+            {% for erro in form.horario_fechamento.errors %}
+                <p class="erro" role="alert">{{ erro }}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="campo">
+        <span class="rotulo" id="rotulo-dias">{{ form.dias_funcionamento.label }}</span>
+        <div class="dias" role="group" aria-labelledby="rotulo-dias">
+            {% for opcao in form.dias_funcionamento %}
+                <label class="dia" title="{{ opcao.choice_label }}">
+                    {{ opcao.tag }}
+                    <span>{{ opcao.choice_label|slice:":3" }}</span>
+                </label>
+            {% endfor %}
+        </div>
+        {% for erro in form.dias_funcionamento.errors %}
+            <p class="erro" role="alert">{{ erro }}</p>
+        {% endfor %}
+    </div>
+</fieldset>

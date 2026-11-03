@@ -1,0 +1,51 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editar {{ quadra.nome }} | Reserva de Quadras</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="{% static 'quadras/cadastro.css' %}">
+</head>
+<body>
+    <main class="tela">
+        <aside class="vitrine" style="--foto: url('{% static 'quadras/img/quadra-futsal.webp' %}')">
+            <div class="vitrine-conteudo">
+                <p class="selo">Reserva de Quadras</p>
+                <h1>Editar<br>quadra</h1>
+                <p class="vitrine-texto">Mudou o horário ou os dias de funcionamento? Atualize aqui e as próximas reservas já seguem os dados novos.</p>
+            </div>
+        </aside>
+
+        <section class="painel" aria-labelledby="titulo-form">
+            <header class="painel-topo">
+                <span class="passo">Edição</span>
+                <h2 id="titulo-form">{{ quadra.nome }}</h2>
+            </header>
+
+            {% if messages %}
+                <div class="aviso aviso-sucesso" aria-live="polite">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if form.non_field_errors %}
+                <div class="aviso aviso-erro" role="alert">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <form method="post" action="{% url 'quadras:editar' quadra.pk %}" novalidate>
+                {% csrf_token %}
+
+                {% include "quadras/_campos.html" %}
+
+                <button type="submit" class="botao">Salvar alterações</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
