@@ -1,4 +1,4 @@
-"""servicos relacionados ao cadastro e a edicao de quadras."""
+"""servicos relacionados ao cadastro, edicao e desativacao de quadras."""
 import datetime
 
 from django.core.exceptions import ValidationError
@@ -51,4 +51,22 @@ def editar_quadra(quadra: Quadra, nome: str, tipo: str, horario_abertura: dateti
     for campo, valor in dados.items():
         setattr(quadra, campo, valor)
     quadra.save()
+    return quadra
+
+
+def desativar_quadra(quadra: Quadra) -> Quadra:
+    """tira a quadra de uso sem apagar do banco, assim o historico de reservas continua."""
+    if not quadra.ativa:
+        raise ValidationError("A quadra já está desativada.")
+    quadra.ativa = False
+    quadra.save(update_fields=["ativa"])
+    return quadra
+
+
+def reativar_quadra(quadra: Quadra) -> Quadra:
+    """coloca de volta em uso uma quadra que estava desativada."""
+    if quadra.ativa:
+        raise ValidationError("A quadra já está ativa.")
+    quadra.ativa = True
+    quadra.save(update_fields=["ativa"])
     return quadra

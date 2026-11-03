@@ -1,11 +1,12 @@
-"""views relacionadas ao cadastro e a edicao de quadras."""
+"""views relacionadas ao cadastro, edicao e desativacao de quadras."""
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from .forms import CadastroQuadraForm
 from .models import Quadra
-from .services import cadastrar_quadra, editar_quadra
+from .services import cadastrar_quadra, desativar_quadra, editar_quadra, reativar_quadra
 
 
 def mostrar_erros_no_form(form, erro):
@@ -54,3 +55,29 @@ def editar(request, pk):
         form = CadastroQuadraForm(initial={"nome": quadra.nome, "tipo": quadra.tipo, "horario_abertura": quadra.horario_abertura, "horario_fechamento": quadra.horario_fechamento, "dias_funcionamento": quadra.dias_funcionamento})
 
     return render(request, "quadras/editar.html", {"form": form, "quadra": quadra})
+
+
+@require_POST
+def desativar(request, pk):
+    """desativa a quadra e volta pra tela de edicao."""
+    quadra = get_object_or_404(Quadra, pk=pk)
+    try:
+        desativar_quadra(quadra)
+    except ValidationError as erro:
+        messages.error(request, erro.messages[0])
+    else:
+        messages.success(request, "Quadra desativada. Ela não aparece mais para reserva.")
+    return redirect("quadras:editar", pk=quadra.pk)
+
+
+@require_POST
+def reativar(request, pk):
+    """reativa a quadra e volta pra tela de edicao."""
+    quadra = get_object_or_404(Quadra, pk=pk)
+    try:
+        reativar_quadra(quadra)
+    except ValidationError as erro:
+        messages.error(request, erro.messages[0])
+    else:
+        messages.success(request, "Quadra reativada. Ela já pode ser reservada de novo.")
+    return redirect("quadras:editar", pk=quadra.pk)

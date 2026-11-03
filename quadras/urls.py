@@ -7,4 +7,6 @@ app_name = "quadras"
 urlpatterns = [
     path("cadastro/", views.cadastro, name="cadastro"),
     path("<int:pk>/editar/", views.editar, name="editar"),
+    path("<int:pk>/desativar/", views.desativar, name="desativar"),
+    path("<int:pk>/reativar/", views.reativar, name="reativar"),
 ]
