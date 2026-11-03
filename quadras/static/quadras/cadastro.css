@@ -289,6 +289,66 @@ body {
 .botao:hover { background: var(--laranja-escuro); }
 .botao:active { transform: translateY(1px); }
 
+/* ---------- situacao da quadra, ativa ou desativada ---------- */
+
+.etiqueta {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.etiqueta-ativa { background: #e6f4ed; color: var(--sucesso); }
+.etiqueta-inativa { background: #ececf1; color: var(--tinta-suave); }
+
+.situacao {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--linha);
+}
+
+.situacao h3 {
+    margin: 0 0 8px;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tinta-suave);
+}
+
+.situacao p {
+    margin: 0 0 16px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--tinta-suave);
+}
+
+.botao-perigo,
+.botao-secundario {
+    padding: 12px 20px;
+    border: 2px solid;
+    border-radius: 6px;
+    background: transparent;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.botao-perigo { border-color: var(--erro); color: var(--erro); }
+.botao-perigo:hover { background: var(--erro); color: var(--branco); }
+
+.botao-secundario { border-color: var(--roxo); color: var(--roxo); }
+.botao-secundario:hover { background: var(--roxo); color: var(--branco); }
+
 /* ---------- celular e tela estreita ---------- */
 
 @media (max-width: 860px) {

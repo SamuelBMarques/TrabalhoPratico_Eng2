@@ -24,15 +24,18 @@
             <header class="painel-topo">
                 <span class="passo">Edição</span>
                 <h2 id="titulo-form">{{ quadra.nome }}</h2>
+                {% if quadra.ativa %}
+                    <span class="etiqueta etiqueta-ativa">Ativa</span>
+                {% else %}
+                    <span class="etiqueta etiqueta-inativa">Desativada</span>
+                {% endif %}
             </header>
 
-            {% if messages %}
-                <div class="aviso aviso-sucesso" aria-live="polite">
-                    {% for message in messages %}
-                        <p>{{ message }}</p>
-                    {% endfor %}
+            {% for message in messages %}
+                <div class="aviso {% if message.tags == 'error' %}aviso-erro{% else %}aviso-sucesso{% endif %}" aria-live="polite">
+                    <p>{{ message }}</p>
                 </div>
-            {% endif %}
+            {% endfor %}
 
             {% if form.non_field_errors %}
                 <div class="aviso aviso-erro" role="alert">{{ form.non_field_errors }}</div>
@@ -45,6 +48,23 @@
 
                 <button type="submit" class="botao">Salvar alterações</button>
             </form>
+
+            <section class="situacao" aria-labelledby="titulo-situacao">
+                <h3 id="titulo-situacao">Situação da quadra</h3>
+                {% if quadra.ativa %}
+                    <p>A quadra está em uso e aparece para reserva. Desativar não apaga nada: o histórico de reservas continua guardado e dá pra reativar depois.</p>
+                    <form method="post" action="{% url 'quadras:desativar' quadra.pk %}" onsubmit="return confirm('Desativar a quadra {{ quadra.nome|escapejs }}?');">
+                        {% csrf_token %}
+                        <button type="submit" class="botao-perigo">Desativar quadra</button>
+                    </form>
+                {% else %}
+                    <p>A quadra está desativada e não aparece para reserva.</p>
+                    <form method="post" action="{% url 'quadras:reativar' quadra.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="botao-secundario">Reativar quadra</button>
+                    </form>
+                {% endif %}
+            </section>
         </section>
     </main>
 </body>
