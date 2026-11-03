@@ -1,4 +1,4 @@
-"""servicos relacionados ao cadastro de quadras."""
+"""servicos relacionados ao cadastro e a edicao de quadras."""
 import datetime
 
 from django.core.exceptions import ValidationError
@@ -7,8 +7,8 @@ from .models import Quadra
 
 
 
-def cadastrar_quadra(nome: str, tipo: str, horario_abertura: datetime.time, horario_fechamento: datetime.time, dias_funcionamento: list[str]) -> Quadra:
-    """valida os dados e salva uma nova quadra no banco."""
+def validar_dados_quadra(nome: str, tipo: str, horario_abertura: datetime.time, horario_fechamento: datetime.time, dias_funcionamento: list[str], quadra_id: int | None = None) -> dict:
+    """valida e limpa os dados de uma quadra, usado no cadastro e na edicao."""
     nome = (nome or "").strip()
     tipo = (tipo or "").strip()
 
@@ -29,7 +29,26 @@ def cadastrar_quadra(nome: str, tipo: str, horario_abertura: datetime.time, hora
     if not dias_validos:
         raise ValidationError({"dias_funcionamento": "Escolha pelo menos um dia."})
 
-    if Quadra.objects.filter(nome__iexact=nome).exists():
+    # na edicao a propria quadra nao conta como nome repetido
+    repetidas = Quadra.objects.filter(nome__iexact=nome)
+    if quadra_id is not None:
+        repetidas = repetidas.exclude(pk=quadra_id)
+    if repetidas.exists():
         raise ValidationError({"nome": "Já existe uma quadra com este nome."})
 
-    return Quadra.objects.create(nome=nome, tipo=tipo, horario_abertura=horario_abertura, horario_fechamento=horario_fechamento, dias_funcionamento=dias_validos)
+    return {"nome": nome, "tipo": tipo, "horario_abertura": horario_abertura, "horario_fechamento": horario_fechamento, "dias_funcionamento": dias_validos}
+
+
+def cadastrar_quadra(nome: str, tipo: str, horario_abertura: datetime.time, horario_fechamento: datetime.time, dias_funcionamento: list[str]) -> Quadra:
+    """valida os dados e salva uma nova quadra no banco."""
+    dados = validar_dados_quadra(nome, tipo, horario_abertura, horario_fechamento, dias_funcionamento)
+    return Quadra.objects.create(**dados)
+
+
+def editar_quadra(quadra: Quadra, nome: str, tipo: str, horario_abertura: datetime.time, horario_fechamento: datetime.time, dias_funcionamento: list[str]) -> Quadra:
+    """valida os dados novos e atualiza uma quadra que ja existe."""
+    dados = validar_dados_quadra(nome, tipo, horario_abertura, horario_fechamento, dias_funcionamento, quadra.pk)
+    for campo, valor in dados.items():
+        setattr(quadra, campo, valor)
+    quadra.save()
+    return quadra
