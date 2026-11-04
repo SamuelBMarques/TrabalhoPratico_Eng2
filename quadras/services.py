@@ -2,6 +2,8 @@
 import datetime
 
 from django.core.exceptions import ValidationError
+from django.db.models import QuerySet
+from django.db.models.functions import Lower
 
 from .models import Quadra
 
@@ -70,3 +72,8 @@ def reativar_quadra(quadra: Quadra) -> Quadra:
     quadra.ativa = True
     quadra.save(update_fields=["ativa"])
     return quadra
+
+
+def listar_quadras() -> QuerySet[Quadra]:
+    """retorna todas as quadras: primeiro as ativas, depois em ordem alfabetica."""
+    return Quadra.objects.order_by("-ativa", Lower("nome"))

@@ -1,0 +1,60 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quadras | Reserva de Quadras</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="{% static 'quadras/cadastro.css' %}">
+    <link rel="stylesheet" href="{% static 'quadras/lista.css' %}">
+</head>
+<body>
+    <header class="topo" style="--foto: url('{% static 'quadras/img/quadra-futsal.webp' %}')">
+        <div class="topo-conteudo">
+            <p class="selo">Reserva de Quadras</p>
+            <h1>Quadras</h1>
+            <p class="topo-texto">Veja as quadras da faculdade e escolha onde quer jogar.</p>
+        </div>
+    </header>
+
+    <main class="catalogo">
+        {% if quadras %}
+            <ul class="grade">
+                {% for quadra in quadras %}
+                    <li class="cartao{% if not quadra.ativa %} cartao-inativo{% endif %}">
+                        <div class="cartao-topo">
+                            <span class="passo">{{ quadra.tipo }}</span>
+                            <h2>{{ quadra.nome }}</h2>
+                        </div>
+
+                        <dl class="cartao-dados">
+                            <div>
+                                <dt>Horário</dt>
+                                <dd>{{ quadra.horario_abertura|time:"H:i" }} às {{ quadra.horario_fechamento|time:"H:i" }}</dd>
+                            </div>
+                            <div>
+                                <dt>Dias</dt>
+                                <dd>{{ quadra.dias_legiveis|join:", " }}</dd>
+                            </div>
+                        </dl>
+
+                        {% if quadra.ativa %}
+                            <span class="etiqueta etiqueta-ativa">Disponível para reserva</span>
+                        {% else %}
+                            <span class="etiqueta etiqueta-inativa">Indisponível para reserva</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="vazio">
+                <h2>Nenhuma quadra cadastrada</h2>
+                <p>Assim que o setor de esportes cadastrar uma quadra, ela aparece aqui.</p>
+            </div>
+        {% endif %}
+    </main>
+</body>
+</html>
