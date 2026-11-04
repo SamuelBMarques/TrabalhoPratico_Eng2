@@ -24,3 +24,8 @@ class Quadra (models.Model):
 
     def __str__(self):
         return self.nome
+
+    @property
+    def dias_legiveis(self) -> list[str]:
+        """nomes dos dias de funcionamento, na ordem da semana."""
+        return [nome for codigo, nome in self.DIAS_SEMANA if codigo in self.dias_funcionamento]

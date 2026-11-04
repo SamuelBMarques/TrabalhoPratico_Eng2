@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 from .forms import CadastroQuadraForm
 from .models import Quadra
 from .services import cadastrar_quadra, desativar_quadra, editar_quadra, reativar_quadra
+from .services import listar_quadras
 
 
 def mostrar_erros_no_form(form, erro):
@@ -81,3 +82,8 @@ def reativar(request, pk):
     else:
         messages.success(request, "Quadra reativada. Ela já pode ser reservada de novo.")
     return redirect("quadras:editar", pk=quadra.pk)
+
+
+def lista(request):
+    """mostra as quadras cadastradas e quais delas podem ser reservadas."""
+    return render(request, "quadras/lista.html", {"quadras": listar_quadras()})

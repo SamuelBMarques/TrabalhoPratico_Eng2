@@ -5,6 +5,7 @@ from . import views
 app_name = "quadras"
 
 urlpatterns = [
+    path("", views.lista, name="lista"),
     path("cadastro/", views.cadastro, name="cadastro"),
     path("<int:pk>/editar/", views.editar, name="editar"),
     path("<int:pk>/desativar/", views.desativar, name="desativar"),
