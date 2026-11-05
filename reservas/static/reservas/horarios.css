@@ -1,0 +1,104 @@
+/* tela de horarios. cores, .topo e .catalogo vem de quadras/cadastro.css e quadras/lista.css */
+
+.voltar {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: var(--branco);
+    font-weight: 500;
+}
+
+.consulta {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 420px;
+    margin-bottom: 32px;
+}
+
+.consulta .campo {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.consulta input[type="date"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--linha);
+    border-radius: 6px;
+    background: var(--branco);
+    color: var(--tinta);
+    font: inherit;
+}
+
+.consulta input[type="date"]:focus {
+    outline: none;
+    border-color: var(--roxo);
+}
+
+/* alinha o botao com o campo, descontando a altura do rotulo */
+.consulta .botao-secundario {
+    margin-top: 25px;
+}
+
+.titulo-horarios {
+    margin: 0 0 16px;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.horarios-livres {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.horarios-livres li {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid var(--linha);
+    border-left: 4px solid var(--sucesso);
+    border-radius: 6px;
+    background: var(--branco);
+    font-weight: 600;
+    text-align: center;
+}
+
+.horarios-livres .botao-secundario {
+    width: 100%;
+    padding: 8px 12px;
+}
+
+.sessao {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.link-sair {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--roxo);
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.entrar-para-reservar {
+    margin: 0 0 16px;
+}
+
+.entrar-para-reservar a {
+    color: var(--roxo);
+    font-weight: 600;
+}

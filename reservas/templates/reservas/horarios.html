@@ -1,0 +1,89 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Horários de {{ quadra.nome }} | Reserva de Quadras</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="{% static 'quadras/cadastro.css' %}">
+    <link rel="stylesheet" href="{% static 'quadras/lista.css' %}">
+    <link rel="stylesheet" href="{% static 'reservas/horarios.css' %}">
+</head>
+<body>
+    <header class="topo" style="--foto: url('{% static 'quadras/img/quadra-futsal.webp' %}')">
+        <div class="topo-conteudo">
+            <a class="voltar" href="{% url 'quadras:lista' %}">← Todas as quadras</a>
+            <h1>{{ quadra.nome }}</h1>
+            <p class="topo-texto">{{ quadra.tipo }} · {{ quadra.horario_abertura|time:"H:i" }} às {{ quadra.horario_fechamento|time:"H:i" }} · {{ quadra.dias_legiveis|join:", " }}</p>
+        </div>
+    </header>
+
+    <main class="catalogo">
+        {% for message in messages %}
+            <div class="aviso {% if message.tags == 'error' %}aviso-erro{% else %}aviso-sucesso{% endif %}" role="status">
+                <p>{{ message }}</p>
+            </div>
+        {% endfor %}
+
+        {% if user.is_authenticated %}
+            <form class="sessao" method="post" action="{% url 'usuarios:logout' %}">
+                {% csrf_token %}
+                <span>Olá, {{ user.get_short_name }}</span>
+                <button type="submit" class="link-sair">Sair</button>
+            </form>
+        {% endif %}
+
+        {% if not quadra.ativa %}
+            <div class="vazio">
+                <h2>Quadra indisponível</h2>
+                <p>Esta quadra está desativada e não aceita reservas.</p>
+            </div>
+        {% else %}
+            <form class="consulta" method="get" novalidate>
+                <div class="campo">
+                    <label for="{{ form.data.id_for_label }}">{{ form.data.label }}</label>
+                    {{ form.data }}
+                    {% for erro in form.data.errors %}
+                        <p class="erro" role="alert">{{ erro }}</p>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="botao-secundario">Consultar</button>
+            </form>
+
+            {% if data %}
+                <section aria-labelledby="titulo-horarios">
+                    <h2 id="titulo-horarios" class="titulo-horarios">Horários livres em {{ data|date:"d/m/Y" }}</h2>
+                    {% if horarios %}
+                        {% if not user.is_authenticated %}
+                            <p class="entrar-para-reservar"><a href="{% url 'usuarios:login' %}?next={{ request.get_full_path|urlencode:'' }}">Entre na sua conta</a> para reservar um horário.</p>
+                        {% endif %}
+                        <ul class="horarios-livres">
+                            {% for horario in horarios %}
+                                <li>
+                                    <span>{{ horario.inicio|time:"H:i" }} às {{ horario.fim|time:"H:i" }}</span>
+                                    {% if user.is_authenticated %}
+                                        <form method="post" action="{% url 'reservas:reservar' quadra.pk %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="data" value="{{ data|date:'Y-m-d' }}">
+                                            <input type="hidden" name="hora_inicio" value="{{ horario.inicio|time:'H:i' }}">
+                                            <button type="submit" class="botao-secundario">Reservar</button>
+                                        </form>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="vazio">
+                            <h2>Nenhum horário disponível</h2>
+                            <p>Não há horários livres nesta data. Tente outro dia.</p>
+                        </div>
+                    {% endif %}
+                </section>
+            {% endif %}
+        {% endif %}
+    </main>
+</body>
+</html>
