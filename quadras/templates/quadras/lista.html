@@ -43,6 +43,7 @@
 
                         {% if quadra.ativa %}
                             <span class="etiqueta etiqueta-ativa">Disponível para reserva</span>
+                            <a class="botao-secundario ver-horarios" href="{% url 'reservas:horarios' quadra.pk %}">Ver horários</a>
                         {% else %}
                             <span class="etiqueta etiqueta-inativa">Indisponível para reserva</span>
                         {% endif %}

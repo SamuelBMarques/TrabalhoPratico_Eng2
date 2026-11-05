@@ -90,6 +90,11 @@
 
 .cartao-inativo .etiqueta-inativa { background: var(--branco); }
 
+.ver-horarios {
+    text-align: center;
+    text-decoration: none;
+}
+
 .vazio {
     padding: 48px 24px;
     border: 2px dashed var(--linha);

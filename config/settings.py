@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "usuarios.apps.UsuariosConfig",
     "quadras.apps.QuadrasConfig",
+    "reservas.apps.ReservasConfig",
 ]
 
 MIDDLEWARE = [
@@ -69,6 +70,10 @@ DATABASES = {
 
 # Definido desde a primeira migração para evitar trocar o modelo de usuário depois.
 AUTH_USER_MODEL = "usuarios.Usuario"
+
+LOGIN_URL = "usuarios:login"
+LOGIN_REDIRECT_URL = "quadras:lista"
+LOGOUT_REDIRECT_URL = "quadras:lista"
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

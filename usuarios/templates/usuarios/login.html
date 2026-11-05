@@ -1,0 +1,47 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entrar | Reserva de Quadras</title>
+    <link rel="stylesheet" href="{% static 'usuarios/cadastro.css' %}">
+</head>
+<body>
+    <main class="pagina">
+        <section class="cartao-cadastro" aria-labelledby="titulo-login">
+            <p class="marca">RESERVA DE QUADRAS</p>
+            <h1 id="titulo-login">Entrar</h1>
+            <p class="descricao">Entre na sua conta para reservar uma quadra.</p>
+
+            {% for erro in form.non_field_errors %}
+                <div class="mensagem erro" role="alert">{{ erro }}</div>
+            {% endfor %}
+
+            <form method="post" action="{% url 'usuarios:login' %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+
+                <div class="campo">
+                    <label for="{{ form.username.id_for_label }}">E-mail</label>
+                    {{ form.username }}
+                    {% for erro in form.username.errors %}
+                        <p class="erro-campo" role="alert">{{ erro }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="campo">
+                    <label for="{{ form.password.id_for_label }}">Senha</label>
+                    {{ form.password }}
+                    {% for erro in form.password.errors %}
+                        <p class="erro-campo" role="alert">{{ erro }}</p>
+                    {% endfor %}
+                </div>
+
+                <button type="submit">Entrar</button>
+            </form>
+            <p class="nota">Ainda não tem conta? <a href="{% url 'usuarios:cadastro' %}">Crie sua conta</a>.</p>
+        </section>
+    </main>
+</body>
+</html>

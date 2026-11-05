@@ -1,5 +1,6 @@
 """Formulários relacionados ao cadastro de usuários."""
 from django import forms
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
@@ -77,3 +78,15 @@ class CadastroUsuarioForm(forms.Form):
         if senha and confirmar_senha and senha != confirmar_senha:
             self.add_error("confirmar_senha", "As senhas não coincidem.")
         return dados
+
+
+class LoginForm(AuthenticationForm):
+    """Login por e-mail, no mesmo formato em que o cadastro salva o endereço."""
+
+    error_messages = {
+        **AuthenticationForm.error_messages,
+        "invalid_login": "E-mail ou senha incorretos.",
+    }
+
+    def clean_username(self):
+        return self.cleaned_data["username"].strip().lower()
