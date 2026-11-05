@@ -39,6 +39,9 @@ Todos os milestones: <https://github.com/SamuelBMarques/TrabalhoPratico_Eng2/mil
 | H11 | Impedir horários duplicados ou conflitantes | ... | #23 |
 | H11 | Criar a tela de gerenciamento de horários | ... | #24 |
 | H11 | Testar o cadastro, a edição e a exclusão de horários | ... | #25 |
+| H03 | Implementar a listagem de quadras | David | #3 |
+| H03 | Criar a tela de visualização de quadras | David | #3 |
+| H03 | Testar a visualização de quadras | David | #3 |
 
 ### Sprints seguintes
 As Sprints 2, 3 e 4 têm apenas o objetivo definido na tabela acima. O backlog de cada uma será detalhado no planejamento da própria sprint, e esta seção será atualizada nesse momento.
