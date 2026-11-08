@@ -1,0 +1,32 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Horários de {{ quadra.nome }} | Reserva de Quadras</title>
+    <link rel="stylesheet" href="{% static 'quadras/cadastro.css' %}">
+</head>
+<body>
+    <main class="painel simples">
+        <a href="{% url 'quadras:editar' quadra.pk %}">← Voltar para a quadra</a>
+        <span class="passo">H11 · Horários</span>
+        <h1>{{ quadra.nome }}</h1>
+        {% for message in messages %}<div class="aviso aviso-sucesso"><p>{{ message }}</p></div>{% endfor %}
+        <a class="botao" href="{% url 'quadras:cadastrar_horario' quadra.pk %}">Cadastrar horário</a>
+        {% if horarios %}
+            <ul>
+                {% for horario in horarios %}
+                    <li>
+                        {{ horario.get_dia_semana_display }}: {{ horario.hora_inicio|time:"H:i" }} às {{ horario.hora_fim|time:"H:i" }}
+                        {% if not horario.ativo %}(inativo){% endif %}
+                        <a href="{% url 'quadras:editar_horario' horario.pk %}">Editar</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Nenhum horário detalhado cadastrado para esta quadra.</p>
+        {% endif %}
+    </main>
+</body>
+</html>

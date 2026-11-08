@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import QuerySet
 from django.db.models.functions import Lower
 
-from .models import Quadra
+from .models import HorarioFuncionamento, Quadra
 
 
 
@@ -77,3 +77,26 @@ def reativar_quadra(quadra: Quadra) -> Quadra:
 def listar_quadras() -> QuerySet[Quadra]:
     """retorna todas as quadras: primeiro as ativas, depois em ordem alfabetica."""
     return Quadra.objects.order_by("-ativa", Lower("nome"))
+
+
+def cadastrar_horario(quadra: Quadra, dia_semana: str, hora_inicio: datetime.time, hora_fim: datetime.time, ativo: bool = True) -> HorarioFuncionamento:
+    if hora_fim <= hora_inicio:
+        raise ValidationError({"hora_fim": "O horário de fechamento deve ser depois da abertura."})
+    return HorarioFuncionamento.objects.create(
+        quadra=quadra,
+        dia_semana=dia_semana,
+        hora_inicio=hora_inicio,
+        hora_fim=hora_fim,
+        ativo=ativo,
+    )
+
+
+def editar_horario(horario: HorarioFuncionamento, dia_semana: str, hora_inicio: datetime.time, hora_fim: datetime.time, ativo: bool = True) -> HorarioFuncionamento:
+    if hora_fim <= hora_inicio:
+        raise ValidationError({"hora_fim": "O horário de fechamento deve ser depois da abertura."})
+    horario.dia_semana = dia_semana
+    horario.hora_inicio = hora_inicio
+    horario.hora_fim = hora_fim
+    horario.ativo = ativo
+    horario.save()
+    return horario

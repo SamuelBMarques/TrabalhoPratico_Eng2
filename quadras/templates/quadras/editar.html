@@ -49,6 +49,8 @@
                 <button type="submit" class="botao">Salvar alterações</button>
             </form>
 
+            <p><a class="botao-secundario" href="{% url 'quadras:horarios' quadra.pk %}">Gerenciar horários</a></p>
+
             <section class="situacao" aria-labelledby="titulo-situacao">
                 <h3 id="titulo-situacao">Situação da quadra</h3>
                 {% if quadra.ativa %}

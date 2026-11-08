@@ -29,3 +29,20 @@ class Quadra (models.Model):
     def dias_legiveis(self) -> list[str]:
         """nomes dos dias de funcionamento, na ordem da semana."""
         return [nome for codigo, nome in self.DIAS_SEMANA if codigo in self.dias_funcionamento]
+
+
+class HorarioFuncionamento(models.Model):
+    quadra = models.ForeignKey(Quadra, on_delete=models.CASCADE, related_name="horarios_funcionamento")
+    dia_semana = models.CharField(max_length=3, choices=Quadra.DIAS_SEMANA)
+    hora_inicio = models.TimeField()
+    hora_fim = models.TimeField()
+    ativo = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["dia_semana", "hora_inicio"]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(hora_fim__gt=models.F("hora_inicio")), name="horario_fim_depois_do_inicio"),
+        ]
+
+    def __str__(self):
+        return f"{self.quadra} - {self.get_dia_semana_display()} {self.hora_inicio:%H:%M} às {self.hora_fim:%H:%M}"

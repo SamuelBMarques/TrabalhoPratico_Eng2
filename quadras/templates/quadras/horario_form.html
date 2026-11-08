@@ -1,0 +1,28 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ titulo }} | Reserva de Quadras</title>
+    <link rel="stylesheet" href="{% static 'quadras/cadastro.css' %}">
+</head>
+<body>
+    <main class="painel simples">
+        <a href="{% url 'quadras:horarios' quadra.pk %}">← Horários de {{ quadra.nome }}</a>
+        <span class="passo">H11 · Configuração</span>
+        <h1>{{ titulo }}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {% for campo in form %}
+                <div class="campo">
+                    {{ campo.label_tag }}
+                    {{ campo }}
+                    {% for erro in campo.errors %}<p class="erro">{{ erro }}</p>{% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="botao">Salvar horário</button>
+        </form>
+    </main>
+</body>
+</html>
