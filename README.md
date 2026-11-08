@@ -96,6 +96,32 @@ O andamento das tarefas é acompanhado no quadro Kanban do GitHub Projects:
 
 🔗 **[Acessar o quadro Kanban](https://github.com/users/SamuelBMarques/projects/2/views/1)**
 
+## ▶️ Execução local
+
+Pré-requisitos: Python 3.12 ou superior instalado.
+
+No terminal, a partir da pasta do projeto:
+
+```powershell
+python -m pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+Acesse <http://127.0.0.1:8000/quadras/> no navegador. Para testar o fluxo de reservas, crie um usuário em <http://127.0.0.1:8000/cadastro/> e cadastre uma quadra pelo painel administrativo:
+
+```powershell
+python manage.py createsuperuser
+```
+
+Depois, abra <http://127.0.0.1:8000/admin/> para cadastrar uma quadra. As reservas do usuário autenticado ficam em <http://127.0.0.1:8000/reservas/minhas/>.
+
+Para executar os testes:
+
+```powershell
+python manage.py test
+```
+
 ---
 
 <p align="center">Engenharia de Software II</p>

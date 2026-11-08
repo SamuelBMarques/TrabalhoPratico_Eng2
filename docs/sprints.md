@@ -43,5 +43,17 @@ Todos os milestones: <https://github.com/SamuelBMarques/TrabalhoPratico_Eng2/mil
 | H03 | Criar a tela de visualização de quadras | David | #3 |
 | H03 | Testar a visualização de quadras | David | #3 |
 
-### Sprints seguintes
-As Sprints 2, 3 e 4 têm apenas o objetivo definido na tabela acima. O backlog de cada uma será detalhado no planejamento da própria sprint, e esta seção será atualizada nesse momento.
+### Sprint 2 — [milestone](https://github.com/SamuelBMarques/TrabalhoPratico_Eng2/milestone/3)
+O backlog da Sprint 2 foi implementado anteriormente pela equipe conforme o objetivo definido na tabela acima.
+
+### Sprint 3 — [milestone](https://github.com/SamuelBMarques/TrabalhoPratico_Eng2/milestone/4)
+| História | Tarefa | Responsável | Issue |
+|----------|--------|-------------|-------|
+| H07 | Cancelar reserva própria e liberar o horário | Kayo Xavier | #7 |
+| H08 | Visualizar as próprias reservas | Kayo Xavier | #8 |
+| H09 | Alterar data ou horário de uma reserva | Kayo Xavier | #17 |
+
+As funcionalidades acima foram implementadas na branch `feat/reservas-7-8-17`, com testes automatizados para autorização, cancelamento, listagem e alteração de reservas. O commit e o pull request devem ser publicados no GitHub após a configuração da identidade e autenticação do Git.
+
+### Sprint 4 — [milestone](https://github.com/SamuelBMarques/TrabalhoPratico_Eng2/milestone/5)
+Reservada para testes finais, correções e apresentação.
