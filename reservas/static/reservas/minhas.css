@@ -1,0 +1,30 @@
+.reservas-pagina { max-width: 900px; }
+
+.lista-reservas { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
+
+.reserva-item { display: flex; justify-content: space-between; gap: 24px; align-items: center; padding: 24px; border: 1px solid var(--linha); background: var(--branco); }
+
+.reserva-item h2 { margin: 4px 0; font-family: "Barlow Condensed", sans-serif; font-size: 1.8rem; text-transform: uppercase; }
+
+.reserva-item p { margin: 0; color: var(--tinta-suave); }
+
+.acoes-reserva { display: flex; gap: 10px; align-items: center; }
+
+.acoes-reserva form { margin: 0; }
+
+.botao-perigo { padding: 10px 14px; border: 2px solid var(--erro); border-radius: 6px; background: transparent; color: var(--erro); font: inherit; font-weight: 600; cursor: pointer; }
+
+.pagina-reserva { width: min(100% - 48px, 560px); margin: 64px auto; }
+
+.pagina-reserva h1 { margin: 8px 0; font-family: "Barlow Condensed", sans-serif; font-size: 3rem; text-transform: uppercase; }
+
+.pagina-reserva form { margin-top: 32px; }
+
+.pagina-reserva input { width: 100%; padding: 12px 14px; border: 2px solid var(--linha); border-radius: 6px; background: var(--branco); color: var(--tinta); font: inherit; font-size: 1rem; }
+
+.pagina-reserva input:focus { outline: none; border-color: var(--roxo); }
+
+@media (max-width: 640px) {
+    .reserva-item { align-items: flex-start; flex-direction: column; }
+    .acoes-reserva { width: 100%; flex-wrap: wrap; }
+}

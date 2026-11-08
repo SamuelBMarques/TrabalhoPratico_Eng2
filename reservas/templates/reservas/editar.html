@@ -1,0 +1,38 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Alterar reserva | Reserva de Quadras</title>
+    <link rel="stylesheet" href="{% static 'quadras/cadastro.css' %}">
+    <link rel="stylesheet" href="{% static 'reservas/minhas.css' %}">
+</head>
+<body>
+    <main class="pagina-reserva">
+        <a class="voltar" href="{% url 'reservas:minhas' %}">← Minhas reservas</a>
+        <p class="passo">{{ reserva.quadra.nome }}</p>
+        <h1>Alterar reserva</h1>
+        <p>Escolha uma nova data e horário para o seu agendamento.</p>
+
+        {% for message in messages %}
+            <div class="aviso aviso-erro" role="alert"><p>{{ message }}</p></div>
+        {% endfor %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="campo">
+                <label for="{{ form.data.id_for_label }}">Data</label>
+                {{ form.data }}
+                {% for erro in form.data.errors %}<p class="erro" role="alert">{{ erro }}</p>{% endfor %}
+            </div>
+            <div class="campo">
+                <label for="{{ form.hora_inicio.id_for_label }}">Horário de início</label>
+                {{ form.hora_inicio }}
+                {% for erro in form.hora_inicio.errors %}<p class="erro" role="alert">{{ erro }}</p>{% endfor %}
+            </div>
+            <button type="submit" class="botao-secundario">Salvar alteração</button>
+        </form>
+    </main>
+</body>
+</html>

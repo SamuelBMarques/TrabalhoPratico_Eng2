@@ -368,3 +368,72 @@ class TelaReservaTests(TestCase):
         resposta = self.client.post(reverse("reservas:reservar", args=[999]), self.dados)
 
         self.assertEqual(resposta.status_code, 404)
+
+
+class MinhasReservasTests(TestCase):
+    def setUp(self):
+        self.usuario = get_user_model().objects.create_user("aluno@teste.com", "Aluno Teste", "senha-forte-123")
+        self.outro = get_user_model().objects.create_user("outro@teste.com", "Outro", "senha-forte-123")
+        self.quadra = criar_quadra()
+        self.reserva = criar_reserva(self.usuario, self.quadra, SEGUNDA, hora("09:00"))
+        self.outra_reserva = criar_reserva(self.outro, self.quadra, SEGUNDA, hora("10:00"))
+        self.client.force_login(self.usuario)
+
+    def test_usuario_visualiza_somente_as_proprias_reservas(self):
+        resposta = self.client.get(reverse("reservas:minhas"))
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertContains(resposta, "09:00 às 10:00")
+        self.assertNotContains(resposta, "10:00 às 11:00")
+
+    def test_usuario_sem_reservas_recebe_indicacao(self):
+        self.reserva.delete()
+
+        resposta = self.client.get(reverse("reservas:minhas"))
+
+        self.assertContains(resposta, "Nenhuma reserva encontrada")
+
+    def test_usuario_cancela_a_propria_reserva(self):
+        resposta = self.client.post(reverse("reservas:cancelar", args=[self.reserva.pk]), follow=True)
+
+        self.assertRedirects(resposta, reverse("reservas:minhas"))
+        self.reserva.refresh_from_db()
+        self.assertEqual(self.reserva.status, Reserva.CANCELADA)
+        self.assertContains(resposta, "Reserva cancelada com sucesso.")
+
+    def test_usuario_nao_cancela_reserva_de_outra_pessoa(self):
+        resposta = self.client.post(reverse("reservas:cancelar", args=[self.outra_reserva.pk]))
+
+        self.assertEqual(resposta.status_code, 404)
+        self.outra_reserva.refresh_from_db()
+        self.assertEqual(self.outra_reserva.status, Reserva.CONFIRMADA)
+
+    def test_usuario_altera_a_propria_reserva(self):
+        resposta = self.client.post(
+            reverse("reservas:editar", args=[self.reserva.pk]),
+            {"data": "2030-01-08", "hora_inicio": "08:00"},
+            follow=True,
+        )
+
+        self.assertRedirects(resposta, reverse("reservas:minhas"))
+        self.reserva.refresh_from_db()
+        self.assertEqual((self.reserva.data, self.reserva.hora_inicio, self.reserva.hora_fim), (TERCA, hora("08:00"), hora("09:00")))
+        self.assertContains(resposta, "Reserva alterada com sucesso.")
+
+    def test_alteracao_indisponivel_preserva_reserva_original(self):
+        resposta = self.client.post(
+            reverse("reservas:editar", args=[self.reserva.pk]),
+            {"data": "2030-01-07", "hora_inicio": "10:00"},
+            follow=True,
+        )
+
+        self.assertContains(resposta, "Esse horário não está mais disponível.")
+        self.reserva.refresh_from_db()
+        self.assertEqual((self.reserva.data, self.reserva.hora_inicio), (SEGUNDA, hora("09:00")))
+
+    def test_visitante_precisa_estar_autenticado_para_ver_reservas(self):
+        self.client.logout()
+
+        resposta = self.client.get(reverse("reservas:minhas"))
+
+        self.assertRedirects(resposta, f"{reverse('usuarios:login')}?next={reverse('reservas:minhas')}")

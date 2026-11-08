@@ -1,0 +1,60 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Minhas reservas | Reserva de Quadras</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="{% static 'quadras/cadastro.css' %}">
+    <link rel="stylesheet" href="{% static 'quadras/lista.css' %}">
+    <link rel="stylesheet" href="{% static 'reservas/minhas.css' %}">
+</head>
+<body>
+    <header class="topo">
+        <div class="topo-conteudo">
+            <a class="voltar" href="{% url 'quadras:lista' %}">← Todas as quadras</a>
+            <h1>Minhas reservas</h1>
+            <p class="topo-texto">Acompanhe seus agendamentos e mantenha seus horários em dia.</p>
+        </div>
+    </header>
+
+    <main class="catalogo reservas-pagina">
+        {% for message in messages %}
+            <div class="aviso {% if message.tags == 'error' %}aviso-erro{% else %}aviso-sucesso{% endif %}" role="status">
+                <p>{{ message }}</p>
+            </div>
+        {% endfor %}
+
+        {% if reservas %}
+            <ul class="lista-reservas">
+                {% for reserva in reservas %}
+                    <li class="reserva-item">
+                        <div>
+                            <span class="passo">{{ reserva.status|title }}</span>
+                            <h2>{{ reserva.quadra.nome }}</h2>
+                            <p>{{ reserva.data|date:"d/m/Y" }} · {{ reserva.hora_inicio|time:"H:i" }} às {{ reserva.hora_fim|time:"H:i" }}</p>
+                        </div>
+                        {% if reserva.status == 'confirmada' %}
+                            <div class="acoes-reserva">
+                                <a class="botao-secundario" href="{% url 'reservas:editar' reserva.pk %}">Alterar</a>
+                                <form method="post" action="{% url 'reservas:cancelar' reserva.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="botao-perigo">Cancelar</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="vazio">
+                <h2>Nenhuma reserva encontrada</h2>
+                <p>Quando você reservar uma quadra, ela aparecerá aqui.</p>
+            </div>
+        {% endif %}
+    </main>
+</body>
+</html>
