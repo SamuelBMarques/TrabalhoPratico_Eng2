@@ -31,9 +31,9 @@ Todos os milestones: <https://github.com/SamuelBMarques/TrabalhoPratico_Eng2/mil
 | H10 | Implementar a exclusão ou desativação de quadras | Pedro Souza | #28 |
 | H10 | Criar a interface de gerenciamento de quadras | ... | #34 |
 | H10 | Testar o gerenciamento de quadras | ... | #29 |
-| H11 | Definir os dados dos horários | ... | #18 |
-| H11 | Implementar o cadastro dos horários de funcionamento | ... | #19 |
-| H11 | Implementar a edição dos horários cadastrados | ... | #20 |
+| H11 | Definir os dados dos horários | Kayo Xavier | #18 |
+| H11 | Implementar o cadastro dos horários de funcionamento | Kayo Xavier | #19 |
+| H11 | Implementar a edição dos horários cadastrados | Kayo Xavier | #20 |
 | H11 | Implementar a exclusão ou desativação de horários | ... | #21 |
 | H11 | Verificar se os horários cadastrados são válidos | ... | #22 |
 | H11 | Impedir horários duplicados ou conflitantes | ... | #23 |

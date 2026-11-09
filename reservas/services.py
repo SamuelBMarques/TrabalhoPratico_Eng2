@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.utils import timezone
 
-from quadras.models import Quadra
+from quadras.models import HorarioFuncionamento, Quadra
 
 from .models import Bloqueio, Reserva
 
@@ -22,6 +22,18 @@ def gerar_horarios_de_funcionamento(quadra: Quadra, data: datetime.date) -> list
     """divide o funcionamento do dia em horarios de 1 hora, a partir da abertura."""
     # weekday() comeca na segunda, mesma ordem de Quadra.DIAS_SEMANA
     codigo_do_dia = Quadra.DIAS_SEMANA[data.weekday()][0]
+    horarios_detalhados = HorarioFuncionamento.objects.filter(quadra=quadra, dia_semana=codigo_do_dia, ativo=True)
+    if horarios_detalhados.exists():
+        intervalos = []
+        for horario in horarios_detalhados:
+            inicio = datetime.datetime.combine(data, horario.hora_inicio)
+            fechamento = datetime.datetime.combine(data, horario.hora_fim)
+            while inicio + DURACAO_HORARIO <= fechamento:
+                fim = inicio + DURACAO_HORARIO
+                intervalos.append(Horario(inicio.time(), fim.time()))
+                inicio = fim
+        return intervalos
+
     if codigo_do_dia not in quadra.dias_funcionamento:
         return []
 

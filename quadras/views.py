@@ -1,12 +1,13 @@
 """views relacionadas ao cadastro, edicao e desativacao de quadras."""
 from django.contrib import messages
-from django.core.exceptions import ValidationError
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from .forms import CadastroQuadraForm
-from .models import Quadra
-from .services import cadastrar_quadra, desativar_quadra, editar_quadra, reativar_quadra
+from .forms import CadastroQuadraForm, HorarioFuncionamentoForm
+from .models import HorarioFuncionamento, Quadra
+from .services import cadastrar_horario, cadastrar_quadra, desativar_quadra, editar_horario, editar_quadra, reativar_quadra
 from .services import listar_quadras
 
 
@@ -87,3 +88,57 @@ def reativar(request, pk):
 def lista(request):
     """mostra as quadras cadastradas e quais delas podem ser reservadas."""
     return render(request, "quadras/lista.html", {"quadras": listar_quadras()})
+
+
+def exigir_administrador(request):
+    if not request.user.is_authenticated:
+        return redirect("usuarios:login")
+    if not request.user.is_staff:
+        raise PermissionDenied
+    return None
+
+
+@login_required
+def horarios(request, quadra_id):
+    bloqueio = exigir_administrador(request)
+    if bloqueio:
+        return bloqueio
+    quadra = get_object_or_404(Quadra, pk=quadra_id)
+    horarios = quadra.horarios_funcionamento.all()
+    return render(request, "quadras/horarios.html", {"quadra": quadra, "horarios": horarios})
+
+
+@login_required
+def cadastrar_horario_view(request, quadra_id):
+    bloqueio = exigir_administrador(request)
+    if bloqueio:
+        return bloqueio
+    quadra = get_object_or_404(Quadra, pk=quadra_id)
+    if request.method == "POST":
+        form = HorarioFuncionamentoForm(request.POST)
+        if form.is_valid():
+            dados = form.cleaned_data
+            cadastrar_horario(quadra, dados["dia_semana"], dados["hora_inicio"], dados["hora_fim"], dados["ativo"])
+            messages.success(request, "Horário cadastrado com sucesso!")
+            return redirect("quadras:horarios", quadra_id=quadra.pk)
+    else:
+        form = HorarioFuncionamentoForm()
+    return render(request, "quadras/horario_form.html", {"form": form, "quadra": quadra, "titulo": "Cadastrar horário"})
+
+
+@login_required
+def editar_horario_view(request, pk):
+    bloqueio = exigir_administrador(request)
+    if bloqueio:
+        return bloqueio
+    horario = get_object_or_404(HorarioFuncionamento, pk=pk)
+    if request.method == "POST":
+        form = HorarioFuncionamentoForm(request.POST, instance=horario)
+        if form.is_valid():
+            dados = form.cleaned_data
+            editar_horario(horario, dados["dia_semana"], dados["hora_inicio"], dados["hora_fim"], dados["ativo"])
+            messages.success(request, "Horário atualizado com sucesso!")
+            return redirect("quadras:horarios", quadra_id=horario.quadra_id)
+    else:
+        form = HorarioFuncionamentoForm(instance=horario)
+    return render(request, "quadras/horario_form.html", {"form": form, "quadra": horario.quadra, "horario": horario, "titulo": "Editar horário"})

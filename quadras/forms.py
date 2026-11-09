@@ -3,7 +3,7 @@ import datetime
 
 from django import forms
 
-from .models import Quadra
+from .models import HorarioFuncionamento, Quadra
 
 
 class CadastroQuadraForm(forms.Form):
@@ -25,4 +25,22 @@ class CadastroQuadraForm(forms.Form):
         fechamento = dados.get("horario_fechamento")
         if abertura and fechamento and fechamento <= abertura:
             self.add_error("horario_fechamento", "O horário de fechamento deve ser depois da abertura.")
+        return dados
+
+
+class HorarioFuncionamentoForm(forms.ModelForm):
+    class Meta:
+        model = HorarioFuncionamento
+        fields = ["dia_semana", "hora_inicio", "hora_fim", "ativo"]
+        widgets = {
+            "hora_inicio": forms.TimeInput(attrs={"type": "time"}, format="%H:%M"),
+            "hora_fim": forms.TimeInput(attrs={"type": "time"}, format="%H:%M"),
+        }
+
+    def clean(self):
+        dados = super().clean()
+        inicio = dados.get("hora_inicio")
+        fim = dados.get("hora_fim")
+        if inicio and fim and fim <= inicio:
+            self.add_error("hora_fim", "O horário de fechamento deve ser depois da abertura.")
         return dados
