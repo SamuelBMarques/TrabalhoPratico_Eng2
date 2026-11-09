@@ -32,9 +32,10 @@ class LoginTests(TestCase):
         self.assertContains(email_inexistente, "E-mail ou senha incorretos.")
 
     def test_volta_para_a_pagina_de_origem(self):
-        resposta = self.entrar(next="/quadras/cadastro/")
+        destino = reverse("quadras:lista") + "?origem=login"
+        resposta = self.entrar(next=destino)
 
-        self.assertRedirects(resposta, "/quadras/cadastro/")
+        self.assertRedirects(resposta, destino)
 
     def test_nao_redireciona_para_site_externo(self):
         resposta = self.entrar(next="https://exemplo.com/")
