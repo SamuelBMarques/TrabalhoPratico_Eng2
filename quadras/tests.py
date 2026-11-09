@@ -130,6 +130,70 @@ class HorariosFuncionamentoTests(TestCase):
 
         self.assertEqual(resposta.status_code, 403)
 
+class InterfaceGerenciamentoQuadrasTests(TestCase):
+    """US10, #34: navegação administrativa e proteção das operações."""
+
+    def setUp(self):
+        self.quadra = criar_quadra()
+        self.admin = get_user_model().objects.create_user(
+            email="gestor@teste.com", nome="Gestor", password="senha-teste-123", is_staff=True,
+        )
+        self.usuario = get_user_model().objects.create_user(
+            email="comum@teste.com", nome="Aluno", password="senha-teste-123",
+        )
+
+    def test_administrador_encontra_cadastro_e_edicao_inclusive_de_desativadas(self):
+        desativar_quadra(self.quadra)
+        self.client.force_login(self.admin)
+
+        resposta = self.client.get(reverse("quadras:gerenciar"))
+
+        self.assertContains(resposta, "Gerenciar quadras")
+        self.assertContains(resposta, reverse("quadras:cadastro"))
+        self.assertContains(resposta, reverse("quadras:editar", args=[self.quadra.pk]))
+        self.assertContains(resposta, self.quadra.nome)
+        self.assertContains(resposta, "Indisponível para reserva")
+
+    def test_gerenciamento_vazio_mantem_acesso_ao_cadastro(self):
+        self.quadra.delete()
+        self.client.force_login(self.admin)
+        resposta = self.client.get(reverse("quadras:gerenciar"))
+        self.assertContains(resposta, "Nenhuma quadra cadastrada")
+        self.assertContains(resposta, reverse("quadras:cadastro"))
+
+    def test_telas_permitem_voltar_ao_gerenciamento(self):
+        self.client.force_login(self.admin)
+        for url in [reverse("quadras:cadastro"), reverse("quadras:editar", args=[self.quadra.pk])]:
+            with self.subTest(url=url):
+                self.assertContains(self.client.get(url), reverse("quadras:gerenciar"))
+
+    def test_catalogo_so_exibe_acesso_administrativo_para_staff(self):
+        url = reverse("quadras:gerenciar")
+        self.assertNotContains(self.client.get(reverse("quadras:lista")), url)
+        self.client.force_login(self.usuario)
+        self.assertNotContains(self.client.get(reverse("quadras:lista")), url)
+        self.client.force_login(self.admin)
+        self.assertContains(self.client.get(reverse("quadras:lista")), url)
+
+    def test_visitante_e_usuario_comum_nao_acessam_operacoes_administrativas(self):
+        urls = [
+            reverse("quadras:gerenciar"), reverse("quadras:cadastro"),
+            reverse("quadras:editar", args=[self.quadra.pk]),
+            reverse("quadras:desativar", args=[self.quadra.pk]),
+            reverse("quadras:reativar", args=[self.quadra.pk]),
+        ]
+        for usuario, esperado in [(None, 302), (self.usuario, 403)]:
+            if usuario:
+                self.client.force_login(usuario)
+            for url in urls:
+                with self.subTest(usuario=usuario, url=url):
+                    resposta = self.client.post(url, {})
+                    self.assertEqual(resposta.status_code, esperado)
+            self.quadra.refresh_from_db()
+            self.assertTrue(self.quadra.ativa)
+            self.assertEqual(Quadra.objects.count(), 1)
+
+
 class GerenciamentoQuadrasTests(TestCase):
     """US10, subissue #29: cadastro, edição e desativação pela interface."""
 

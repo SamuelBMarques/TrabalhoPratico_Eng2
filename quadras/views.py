@@ -20,6 +20,9 @@ def mostrar_erros_no_form(form, erro):
 
 def cadastro(request):
     """exibe e processa o formulario de cadastro de quadra."""
+    bloqueio = exigir_administrador(request)
+    if bloqueio:
+        return bloqueio
     if request.method == "POST":
         form = CadastroQuadraForm(request.POST)
         if form.is_valid():
@@ -39,6 +42,9 @@ def cadastro(request):
 
 def editar(request, pk):
     """exibe a quadra preenchida no formulario e salva as alteracoes."""
+    bloqueio = exigir_administrador(request)
+    if bloqueio:
+        return bloqueio
     quadra = get_object_or_404(Quadra, pk=pk)
 
     if request.method == "POST":
@@ -62,6 +68,9 @@ def editar(request, pk):
 @require_POST
 def desativar(request, pk):
     """desativa a quadra e volta pra tela de edicao."""
+    bloqueio = exigir_administrador(request)
+    if bloqueio:
+        return bloqueio
     quadra = get_object_or_404(Quadra, pk=pk)
     try:
         desativar_quadra(quadra)
@@ -75,6 +84,9 @@ def desativar(request, pk):
 @require_POST
 def reativar(request, pk):
     """reativa a quadra e volta pra tela de edicao."""
+    bloqueio = exigir_administrador(request)
+    if bloqueio:
+        return bloqueio
     quadra = get_object_or_404(Quadra, pk=pk)
     try:
         reativar_quadra(quadra)
@@ -88,6 +100,16 @@ def reativar(request, pk):
 def lista(request):
     """mostra as quadras cadastradas e quais delas podem ser reservadas."""
     return render(request, "quadras/lista.html", {"quadras": listar_quadras()})
+
+
+def gerenciar(request):
+    """reune as quadras e os acessos as operacoes administrativas."""
+    bloqueio = exigir_administrador(request)
+    if bloqueio:
+        return bloqueio
+    return render(request, "quadras/lista.html", {
+        "quadras": listar_quadras(), "gerenciando": True,
+    })
 
 
 def exigir_administrador(request):

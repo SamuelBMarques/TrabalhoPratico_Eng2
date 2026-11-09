@@ -1,5 +1,17 @@
 /* tela de listagem. as cores e a .etiqueta vem do cadastro.css */
 
+.acoes-gerenciamento {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.acoes-gerenciamento a { color: var(--roxo); }
+.acoes-gerenciamento .botao-secundario { text-decoration: none; }
+.acoes-gerenciamento .botao-secundario:hover { color: var(--branco); }
+
 .topo {
     /* mesma margem do .catalogo, para alinhar com os cartoes */
     padding: 56px max(24px, calc((100% - 1120px) / 2 + 24px));

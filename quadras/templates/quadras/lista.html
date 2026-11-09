@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Quadras | Reserva de Quadras</title>
+    <title>{% if gerenciando %}Gerenciar quadras{% else %}Quadras{% endif %} | Reserva de Quadras</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
@@ -15,12 +15,22 @@
     <header class="topo" style="--foto: url('{% static 'quadras/img/quadra-futsal.webp' %}')">
         <div class="topo-conteudo">
             <p class="selo">Reserva de Quadras</p>
-            <h1>Quadras</h1>
-            <p class="topo-texto">Veja as quadras da faculdade e escolha onde quer jogar.</p>
+            <h1>{% if gerenciando %}Gerenciar quadras{% else %}Quadras{% endif %}</h1>
+            <p class="topo-texto">{% if gerenciando %}Cadastre espaços e mantenha os dados e a situação das quadras atualizados.{% else %}Veja as quadras da faculdade e escolha onde quer jogar.{% endif %}</p>
         </div>
     </header>
 
     <main class="catalogo">
+        {% if request.user.is_staff %}
+            <nav class="acoes-gerenciamento" aria-label="Gerenciamento de quadras">
+                {% if gerenciando %}
+                    <a class="botao-secundario" href="{% url 'quadras:cadastro' %}">Cadastrar quadra</a>
+                    <a href="{% url 'quadras:lista' %}">Ver catálogo de quadras</a>
+                {% else %}
+                    <a class="botao-secundario" href="{% url 'quadras:gerenciar' %}">Gerenciar quadras</a>
+                {% endif %}
+            </nav>
+        {% endif %}
         {% if quadras %}
             <ul class="grade">
                 {% for quadra in quadras %}
@@ -46,6 +56,9 @@
                             <a class="botao-secundario ver-horarios" href="{% url 'reservas:horarios' quadra.pk %}">Ver horários</a>
                         {% else %}
                             <span class="etiqueta etiqueta-inativa">Indisponível para reserva</span>
+                        {% endif %}
+                        {% if gerenciando %}
+                            <a class="botao-secundario ver-horarios" href="{% url 'quadras:editar' quadra.pk %}">Editar quadra e situação</a>
                         {% endif %}
                     </li>
                 {% endfor %}
