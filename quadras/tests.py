@@ -1,9 +1,110 @@
 import datetime
 
 from django.test import TestCase
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from .services import cadastrar_quadra, desativar_quadra, editar_quadra, listar_quadras
+from .models import Quadra
+
+
+class GerenciamentoQuadrasTests(TestCase):
+    """US10, subissue #29: cadastro, edição e desativação pela interface."""
+
+    def setUp(self):
+        administrador = get_user_model().objects.create_superuser(
+            email="admin@teste.com", nome="Administrador", password="senha-teste-123"
+        )
+        self.client.force_login(administrador)
+        self.dados = {
+            "nome": "Quadra Central", "tipo": "Futsal",
+            "horario_abertura": "08:00", "horario_fechamento": "22:00",
+            "dias_funcionamento": ["seg", "qua"],
+        }
+
+    def test_cadastro_persiste_dados_e_informa_sucesso(self):
+        resposta = self.client.post(reverse("quadras:cadastro"), self.dados, follow=True)
+
+        quadra = Quadra.objects.get()
+        self.assertEqual(quadra.nome, "Quadra Central")
+        self.assertEqual(quadra.tipo, "Futsal")
+        self.assertEqual(quadra.horario_abertura, datetime.time(8))
+        self.assertEqual(quadra.horario_fechamento, datetime.time(22))
+        self.assertEqual(quadra.dias_funcionamento, ["seg", "qua"])
+        self.assertTrue(quadra.ativa)
+        self.assertContains(resposta, "Quadra cadastrada com sucesso!")
+
+    def test_cadastro_invalido_nao_persiste(self):
+        casos = [
+            {"nome": " "}, {"tipo": ""}, {"dias_funcionamento": []},
+            {"dias_funcionamento": ["invalido"]},
+            {"horario_abertura": "invalido"},
+            {"horario_fechamento": "08:00"},
+            {"horario_fechamento": "07:00"},
+        ]
+        for alteracao in casos:
+            with self.subTest(alteracao=alteracao):
+                resposta = self.client.post(reverse("quadras:cadastro"), {**self.dados, **alteracao})
+                self.assertEqual(resposta.status_code, 200)
+                self.assertTrue(resposta.context["form"].errors)
+                self.assertFalse(Quadra.objects.exists())
+
+    def test_cadastro_recusa_nome_repetido_sem_distinguir_maiusculas(self):
+        criar_quadra("Quadra Central")
+        resposta = self.client.post(reverse("quadras:cadastro"), {**self.dados, "nome": " quadra central "})
+
+        self.assertContains(resposta, "Já existe uma quadra com este nome.")
+        self.assertEqual(Quadra.objects.count(), 1)
+
+    def test_edicao_atualiza_a_mesma_quadra(self):
+        quadra = criar_quadra()
+        resposta = self.client.post(reverse("quadras:editar", args=[quadra.pk]), self.dados, follow=True)
+
+        quadra.refresh_from_db()
+        self.assertEqual(quadra.nome, "Quadra Central")
+        self.assertEqual(Quadra.objects.count(), 1)
+        self.assertContains(resposta, "Quadra atualizada com sucesso!")
+
+    def test_edicao_invalida_preserva_dados_originais(self):
+        quadra = criar_quadra("Original")
+        resposta = self.client.post(reverse("quadras:editar", args=[quadra.pk]), {
+            **self.dados, "horario_fechamento": "07:00",
+        })
+
+        quadra.refresh_from_db()
+        self.assertTrue(resposta.context["form"].errors)
+        self.assertEqual(quadra.nome, "Original")
+        self.assertEqual(quadra.horario_fechamento, datetime.time(22))
+
+    def test_desativacao_preserva_quadra_e_reservas(self):
+        from reservas.models import Reserva
+        usuario = get_user_model().objects.create_user(email="aluno@teste.com", nome="Aluno", password="senha-teste-123")
+        quadra = criar_quadra()
+        reserva = Reserva.objects.create(
+            usuario=usuario, quadra=quadra, data=datetime.date(2030, 1, 7),
+            hora_inicio=datetime.time(8), hora_fim=datetime.time(9),
+        )
+
+        resposta = self.client.post(reverse("quadras:desativar", args=[quadra.pk]), follow=True)
+
+        quadra.refresh_from_db()
+        reserva.refresh_from_db()
+        self.assertFalse(quadra.ativa)
+        self.assertEqual(reserva.quadra_id, quadra.pk)
+        self.assertEqual(reserva.status, Reserva.CONFIRMADA)
+        self.assertContains(resposta, "Quadra desativada.")
+
+    def test_get_nao_desativa_quadra(self):
+        quadra = criar_quadra()
+        resposta = self.client.get(reverse("quadras:desativar", args=[quadra.pk]))
+
+        quadra.refresh_from_db()
+        self.assertEqual(resposta.status_code, 405)
+        self.assertTrue(quadra.ativa)
+
+    def test_edicao_de_quadra_inexistente_retorna_404(self):
+        resposta = self.client.post(reverse("quadras:editar", args=[999]), self.dados)
+        self.assertEqual(resposta.status_code, 404)
 
 
 def criar_quadra(nome="Quadra 1", tipo="Futsal", dias=None):
