@@ -35,7 +35,7 @@ Todos os milestones: <https://github.com/SamuelBMarques/TrabalhoPratico_Eng2/mil
 | H11 | Implementar o cadastro dos horários de funcionamento | Kayo Xavier | #19 |
 | H11 | Implementar a edição dos horários cadastrados | Kayo Xavier | #20 |
 | H11 | Implementar a exclusão ou desativação de horários | ... | #21 |
-| H11 | Verificar se os horários cadastrados são válidos | ... | #22 |
+| H11 | Verificar se os horários cadastrados são válidos | Matheus Cardoso | #22 |
 | H11 | Impedir horários duplicados ou conflitantes | ... | #23 |
 | H11 | Criar a tela de gerenciamento de horários | ... | #24 |
 | H11 | Testar o cadastro, a edição e a exclusão de horários | ... | #25 |
@@ -47,7 +47,7 @@ Todos os milestones: <https://github.com/SamuelBMarques/TrabalhoPratico_Eng2/mil
 | História | Tarefas | Responsável | Issue |
 |----------|---------|-------------|-------|
 | H11 | Implementar a exclusão ou desativação de horários | A definir | #21 |
-| H11 | Verificar se os horários cadastrados são válidos | A definir | #22 |
+| H11 | Verificar se os horários cadastrados são válidos | Matheus Cardoso | #22 |
 | H11 | Impedir horários duplicados ou conflitantes | A definir | #23 |
 | H11 | Criar a tela de gerenciamento de horários | A definir | #24 |
 | H11 | Testar o cadastro, a edição e a exclusão de horários | A definir | #25 |

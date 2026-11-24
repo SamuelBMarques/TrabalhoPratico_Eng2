@@ -79,24 +79,32 @@ def listar_quadras() -> QuerySet[Quadra]:
     return Quadra.objects.order_by("-ativa", Lower("nome"))
 
 
-def cadastrar_horario(quadra: Quadra, dia_semana: str, hora_inicio: datetime.time, hora_fim: datetime.time, ativo: bool = True) -> HorarioFuncionamento:
+def validar_dados_horario(dia_semana: str, hora_inicio: datetime.time, hora_fim: datetime.time) -> dict:
+    """valida os dados de funcionamento, usado no cadastro e na edicao."""
+    if dia_semana not in dict(Quadra.DIAS_SEMANA):
+        raise ValidationError({"dia_semana": "Escolha um dia da semana válido."})
+    if not isinstance(hora_inicio, datetime.time):
+        raise ValidationError({"hora_inicio": "Informe um horário de início válido."})
+    if not isinstance(hora_fim, datetime.time):
+        raise ValidationError({"hora_fim": "Informe um horário de fim válido."})
     if hora_fim <= hora_inicio:
         raise ValidationError({"hora_fim": "O horário de fechamento deve ser depois da abertura."})
+    return {"dia_semana": dia_semana, "hora_inicio": hora_inicio, "hora_fim": hora_fim}
+
+
+def cadastrar_horario(quadra: Quadra, dia_semana: str, hora_inicio: datetime.time, hora_fim: datetime.time, ativo: bool = True) -> HorarioFuncionamento:
+    dados = validar_dados_horario(dia_semana, hora_inicio, hora_fim)
     return HorarioFuncionamento.objects.create(
         quadra=quadra,
-        dia_semana=dia_semana,
-        hora_inicio=hora_inicio,
-        hora_fim=hora_fim,
         ativo=ativo,
+        **dados,
     )
 
 
 def editar_horario(horario: HorarioFuncionamento, dia_semana: str, hora_inicio: datetime.time, hora_fim: datetime.time, ativo: bool = True) -> HorarioFuncionamento:
-    if hora_fim <= hora_inicio:
-        raise ValidationError({"hora_fim": "O horário de fechamento deve ser depois da abertura."})
-    horario.dia_semana = dia_semana
-    horario.hora_inicio = hora_inicio
-    horario.hora_fim = hora_fim
+    dados = validar_dados_horario(dia_semana, hora_inicio, hora_fim)
+    for campo, valor in dados.items():
+        setattr(horario, campo, valor)
     horario.ativo = ativo
     horario.save()
     return horario

@@ -1,6 +1,7 @@
 import datetime
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 
@@ -129,6 +130,69 @@ class HorariosFuncionamentoTests(TestCase):
         resposta = self.client.get(reverse("quadras:horarios", args=[self.quadra.pk]))
 
         self.assertEqual(resposta.status_code, 403)
+
+class ValidacaoHorariosTests(TestCase):
+    """H11: dados invalidos nao criam nem alteram horarios."""
+
+    def setUp(self):
+        self.quadra = criar_quadra()
+        self.admin = get_user_model().objects.create_user("admin@teste.com", "Administrador", "senha-forte-123", is_staff=True)
+        self.dados = {"dia_semana": "seg", "hora_inicio": "08:00", "hora_fim": "12:00", "ativo": "on"}
+
+    def casos_invalidos(self):
+        return [
+            ("", datetime.time(8), datetime.time(12), "dia_semana"),
+            ("invalido", datetime.time(8), datetime.time(12), "dia_semana"),
+            (None, datetime.time(8), datetime.time(12), "dia_semana"),
+            ("seg", None, datetime.time(12), "hora_inicio"),
+            ("seg", "invalido", datetime.time(12), "hora_inicio"),
+            ("seg", datetime.time(8), None, "hora_fim"),
+            ("seg", datetime.time(8), "invalido", "hora_fim"),
+            ("seg", datetime.time(12), datetime.time(12), "hora_fim"),
+            ("seg", datetime.time(13), datetime.time(12), "hora_fim"),
+        ]
+
+    def test_servico_recusa_cadastro_invalido_sem_persistir(self):
+        for dia, inicio, fim, campo in self.casos_invalidos():
+            with self.subTest(dia=dia, inicio=inicio, fim=fim):
+                with self.assertRaises(ValidationError) as erro:
+                    cadastrar_horario(self.quadra, dia, inicio, fim)
+                self.assertIn(campo, erro.exception.message_dict)
+                self.assertFalse(HorarioFuncionamento.objects.exists())
+
+    def test_servico_recusa_edicao_invalida_e_preserva_dados(self):
+        horario = cadastrar_horario(self.quadra, "qua", datetime.time(8), datetime.time(12))
+        for dia, inicio, fim, campo in self.casos_invalidos():
+            with self.subTest(dia=dia, inicio=inicio, fim=fim):
+                with self.assertRaises(ValidationError) as erro:
+                    editar_horario(horario, dia, inicio, fim, False)
+                self.assertIn(campo, erro.exception.message_dict)
+                self.assertEqual((horario.dia_semana, horario.hora_inicio, horario.hora_fim, horario.ativo), ("qua", datetime.time(8), datetime.time(12), True))
+                horario.refresh_from_db()
+                self.assertEqual((horario.dia_semana, horario.hora_inicio, horario.hora_fim, horario.ativo), ("qua", datetime.time(8), datetime.time(12), True))
+
+    def test_interface_recusa_dados_invalidos_no_cadastro_e_na_edicao(self):
+        self.client.force_login(self.admin)
+        horario = cadastrar_horario(self.quadra, "seg", datetime.time(8), datetime.time(12))
+        urls = [reverse("quadras:cadastrar_horario", args=[self.quadra.pk]), reverse("quadras:editar_horario", args=[horario.pk])]
+        casos = [("dia_semana", ""), ("dia_semana", "invalido"), ("hora_inicio", ""), ("hora_inicio", "25:00"), ("hora_fim", ""), ("hora_fim", "invalido"), ("hora_fim", "08:00"), ("hora_fim", "07:00")]
+        for url in urls:
+            for campo, valor in casos:
+                with self.subTest(url=url, campo=campo, valor=valor):
+                    resposta = self.client.post(url, {**self.dados, campo: valor})
+                    self.assertEqual(resposta.status_code, 200)
+                    self.assertIn(campo, resposta.context["form"].errors)
+                    self.assertEqual(HorarioFuncionamento.objects.count(), 1)
+                    horario.refresh_from_db()
+                    self.assertEqual((horario.dia_semana, horario.hora_inicio, horario.hora_fim), ("seg", datetime.time(8), datetime.time(12)))
+
+    def test_servico_aceita_meia_noite_e_todos_os_dias_validos(self):
+        for dia, _ in Quadra.DIAS_SEMANA:
+            with self.subTest(dia=dia):
+                horario = cadastrar_horario(self.quadra, dia, datetime.time(0), datetime.time(1))
+                self.assertEqual(horario.hora_inicio, datetime.time(0))
+        self.assertEqual(HorarioFuncionamento.objects.count(), 7)
+
 
 class InterfaceGerenciamentoQuadrasTests(TestCase):
     """US10, #34: navegação administrativa e proteção das operações."""
