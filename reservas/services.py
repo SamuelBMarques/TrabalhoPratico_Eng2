@@ -22,11 +22,11 @@ def gerar_horarios_de_funcionamento(quadra: Quadra, data: datetime.date) -> list
     """divide o funcionamento do dia em horarios de 1 hora, a partir da abertura."""
     # weekday() comeca na segunda, mesma ordem de Quadra.DIAS_SEMANA
     codigo_do_dia = Quadra.DIAS_SEMANA[data.weekday()][0]
-    horarios_configurados = HorarioFuncionamento.objects.filter(quadra=quadra, dia_semana=codigo_do_dia)
-    if horarios_configurados.exists():
-        horarios_detalhados = horarios_configurados.filter(ativo=True)
+    horarios_detalhados = HorarioFuncionamento.objects.filter(quadra=quadra, dia_semana=codigo_do_dia)
+    if horarios_detalhados.exists():
         intervalos = []
-        for horario in horarios_detalhados:
+        # se o dia tem blocos, so os ativos contam, todos desativados fecha o dia
+        for horario in horarios_detalhados.filter(ativo=True):
             inicio = datetime.datetime.combine(data, horario.hora_inicio)
             fechamento = datetime.datetime.combine(data, horario.hora_fim)
             while inicio + DURACAO_HORARIO <= fechamento:

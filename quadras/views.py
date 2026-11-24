@@ -7,8 +7,8 @@ from django.views.decorators.http import require_POST
 
 from .forms import CadastroQuadraForm, HorarioFuncionamentoForm
 from .models import HorarioFuncionamento, Quadra
-from .services import cadastrar_horario, cadastrar_quadra, desativar_horario, desativar_quadra, editar_horario, editar_quadra, reativar_quadra
-from .services import listar_quadras
+from .services import cadastrar_horario, cadastrar_quadra, desativar_horario, desativar_quadra
+from .services import editar_horario, editar_quadra, listar_quadras, reativar_horario, reativar_quadra
 
 
 def mostrar_erros_no_form(form, erro):
@@ -189,3 +189,19 @@ def desativar_horario_view(request, pk):
     else:
         messages.success(request, "Horário desativado com sucesso.")
     return redirect("quadras:horarios", quadra_id=quadra_id)
+
+
+@require_POST
+@login_required
+def reativar_horario_view(request, pk):
+    bloqueio = exigir_administrador(request)
+    if bloqueio:
+        return bloqueio
+    horario = get_object_or_404(HorarioFuncionamento, pk=pk)
+    try:
+        reativar_horario(horario)
+    except ValidationError as erro:
+        messages.error(request, erro.messages[0])
+    else:
+        messages.success(request, "Horário reativado. Ele já pode ser reservado de novo.")
+    return redirect("quadras:horarios", quadra_id=horario.quadra_id)

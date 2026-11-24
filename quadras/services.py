@@ -145,3 +145,19 @@ def desativar_horario(horario: HorarioFuncionamento) -> HorarioFuncionamento:
     horario.ativo = False
     horario.save(update_fields=["ativo"])
     return horario
+
+
+def reativar_horario(horario: HorarioFuncionamento) -> HorarioFuncionamento:
+    if horario.ativo:
+        raise ValidationError("O horário já está ativo.")
+    validar_horario_funcionamento(
+        horario.quadra,
+        horario.dia_semana,
+        horario.hora_inicio,
+        horario.hora_fim,
+        horario_id=horario.pk,
+        ativo=True,
+    )
+    horario.ativo = True
+    horario.save(update_fields=["ativo"])
+    return horario

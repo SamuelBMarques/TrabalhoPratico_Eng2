@@ -31,9 +31,14 @@
                         <div class="acoes-horario">
                             <a class="botao-secundario" href="{% url 'quadras:editar_horario' horario.pk %}">Editar</a>
                             {% if horario.ativo %}
-                                <form method="post" action="{% url 'quadras:desativar_horario' horario.pk %}">
+                                <form class="form-inline" method="post" action="{% url 'quadras:desativar_horario' horario.pk %}">
                                     {% csrf_token %}
                                     <button type="submit" class="botao-perigo">Desativar</button>
+                                </form>
+                            {% else %}
+                                <form class="form-inline" method="post" action="{% url 'quadras:reativar_horario' horario.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="botao-secundario">Reativar</button>
                                 </form>
                             {% endif %}
                         </div>

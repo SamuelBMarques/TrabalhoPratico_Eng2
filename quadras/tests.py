@@ -174,6 +174,30 @@ class HorariosFuncionamentoTests(TestCase):
         self.assertContains(resposta, "Horário desativado com sucesso.")
         self.assertContains(resposta, "Desativado")
         self.assertNotContains(resposta, reverse("quadras:desativar_horario", args=[horario.pk]))
+        self.assertContains(resposta, reverse("quadras:reativar_horario", args=[horario.pk]))
+
+    def test_admin_reativa_horario_desativado(self):
+        horario = cadastrar_horario(self.quadra, "seg", datetime.time(8), datetime.time(12), ativo=False)
+        self.client.force_login(self.admin)
+
+        resposta = self.client.post(reverse("quadras:reativar_horario", args=[horario.pk]), follow=True)
+
+        horario.refresh_from_db()
+        self.assertRedirects(resposta, reverse("quadras:horarios", args=[self.quadra.pk]))
+        self.assertTrue(horario.ativo)
+        self.assertContains(resposta, "Horário reativado.")
+        self.assertContains(resposta, reverse("quadras:desativar_horario", args=[horario.pk]))
+
+    def test_reativacao_recusa_conflito_com_horario_ativo(self):
+        desativado = cadastrar_horario(self.quadra, "seg", datetime.time(8), datetime.time(12), ativo=False)
+        cadastrar_horario(self.quadra, "seg", datetime.time(10), datetime.time(14))
+        self.client.force_login(self.admin)
+
+        resposta = self.client.post(reverse("quadras:reativar_horario", args=[desativado.pk]), follow=True)
+
+        desativado.refresh_from_db()
+        self.assertFalse(desativado.ativo)
+        self.assertContains(resposta, "Este horário se sobrepõe a outro horário ativo da quadra.")
 
     def test_get_nao_desativa_horario(self):
         horario = cadastrar_horario(self.quadra, "seg", datetime.time(8), datetime.time(12))
@@ -219,6 +243,8 @@ class HorariosFuncionamentoTests(TestCase):
         self.assertContains(resposta, "08:00 às 12:00", count=2)
         self.assertContains(resposta, reverse("quadras:editar_horario", args=[ativo.pk]))
         self.assertContains(resposta, reverse("quadras:editar_horario", args=[desativado.pk]))
+        self.assertContains(resposta, reverse("quadras:desativar_horario", args=[ativo.pk]))
+        self.assertContains(resposta, reverse("quadras:reativar_horario", args=[desativado.pk]))
 
 class InterfaceGerenciamentoQuadrasTests(TestCase):
     """US10, #34: navegação administrativa e proteção das operações."""

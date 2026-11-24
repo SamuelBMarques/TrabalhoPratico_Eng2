@@ -41,17 +41,6 @@
     margin: 0;
 }
 
-.botao-perigo {
-    padding: 10px 14px;
-    border: 2px solid var(--erro);
-    border-radius: 6px;
-    background: transparent;
-    color: var(--erro);
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
-}
-
 @media (max-width: 620px) {
     .horario-item {
         grid-template-columns: 1fr auto;
