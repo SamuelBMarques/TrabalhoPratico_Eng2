@@ -46,11 +46,11 @@ Todos os milestones: <https://github.com/SamuelBMarques/TrabalhoPratico_Eng2/mil
 ### Sprint 2 — [milestone](https://github.com/SamuelBMarques/TrabalhoPratico_Eng2/milestone/3)
 | História | Tarefas | Responsável | Issue |
 |----------|---------|-------------|-------|
-| H11 | Implementar a exclusão ou desativação de horários | A definir | #21 |
-| H11 | Verificar se os horários cadastrados são válidos | A definir | #22 |
-| H11 | Impedir horários duplicados ou conflitantes | A definir | #23 |
-| H11 | Criar a tela de gerenciamento de horários | A definir | #24 |
-| H11 | Testar o cadastro, a edição e a exclusão de horários | A definir | #25 |
+| H11 | Implementar a exclusão ou desativação de horários | Kayo Xavier | #21 |
+| H11 | Verificar se os horários cadastrados são válidos | Kayo Xavier | #22 |
+| H11 | Impedir horários duplicados ou conflitantes | Kayo Xavier | #23 |
+| H11 | Criar a tela de gerenciamento de horários | Kayo Xavier | #24 |
+| H11 | Testar o cadastro, a edição e a exclusão de horários | Kayo Xavier | #25 |
 | H02 | Configurar a autenticação por e-mail e senha | A definir | #48 |
 | H02 | Criar a tela de login | A definir | #49 |
 | H02 | Implementar o logout e o retorno à página de origem | A definir | #50 |
