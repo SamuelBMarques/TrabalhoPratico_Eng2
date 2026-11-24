@@ -194,6 +194,85 @@ class ValidacaoHorariosTests(TestCase):
         self.assertEqual(HorarioFuncionamento.objects.count(), 7)
 
 
+class ConflitosHorariosTests(TestCase):
+    """H11: horarios ativos da mesma quadra e dia nao podem se sobrepor."""
+
+    def setUp(self):
+        self.quadra = criar_quadra()
+        self.horario = cadastrar_horario(self.quadra, "seg", datetime.time(8), datetime.time(12))
+
+    def test_cadastro_recusa_duplicidade_e_todas_as_sobreposicoes(self):
+        for inicio, fim in [(8, 12), (9, 10), (7, 13), (7, 9), (11, 13)]:
+            with self.subTest(inicio=inicio, fim=fim):
+                with self.assertRaises(ValidationError) as erro:
+                    cadastrar_horario(self.quadra, "seg", datetime.time(inicio), datetime.time(fim))
+                self.assertIn("hora_inicio", erro.exception.message_dict)
+                self.assertEqual(HorarioFuncionamento.objects.count(), 1)
+
+    def test_edicao_recusa_conflito_e_preserva_dados(self):
+        horario = cadastrar_horario(self.quadra, "seg", datetime.time(14), datetime.time(16))
+        with self.assertRaises(ValidationError):
+            editar_horario(horario, "seg", datetime.time(11), datetime.time(15))
+        self.assertEqual((horario.hora_inicio, horario.hora_fim), (datetime.time(14), datetime.time(16)))
+        horario.refresh_from_db()
+        self.assertEqual((horario.hora_inicio, horario.hora_fim), (datetime.time(14), datetime.time(16)))
+
+    def test_edicao_verifica_conflito_ao_mudar_o_dia(self):
+        horario = cadastrar_horario(self.quadra, "ter", datetime.time(8), datetime.time(12))
+        with self.assertRaises(ValidationError):
+            editar_horario(horario, "seg", datetime.time(8), datetime.time(12))
+        horario.refresh_from_db()
+        self.assertEqual(horario.dia_semana, "ter")
+
+    def test_aceita_intervalos_adjacentes_e_separados(self):
+        for inicio, fim in [(6, 8), (12, 14), (16, 18)]:
+            with self.subTest(inicio=inicio, fim=fim):
+                cadastrar_horario(self.quadra, "seg", datetime.time(inicio), datetime.time(fim))
+        self.assertEqual(HorarioFuncionamento.objects.count(), 4)
+
+    def test_aceita_mesmo_intervalo_em_outra_quadra_ou_dia(self):
+        outra_quadra = criar_quadra("Quadra 2")
+        cadastrar_horario(outra_quadra, "seg", datetime.time(8), datetime.time(12))
+        cadastrar_horario(self.quadra, "ter", datetime.time(8), datetime.time(12))
+        self.assertEqual(HorarioFuncionamento.objects.count(), 3)
+
+    def test_edicao_nao_conflita_com_o_proprio_registro(self):
+        editar_horario(self.horario, "seg", datetime.time(8), datetime.time(12))
+        editar_horario(self.horario, "seg", datetime.time(9), datetime.time(13))
+        self.horario.refresh_from_db()
+        self.assertEqual((self.horario.hora_inicio, self.horario.hora_fim), (datetime.time(9), datetime.time(13)))
+        self.assertEqual(HorarioFuncionamento.objects.count(), 1)
+
+    def test_inativo_nao_bloqueia_mas_reativacao_valida_conflitos(self):
+        inativo = cadastrar_horario(self.quadra, "seg", datetime.time(8), datetime.time(12), False)
+        with self.assertRaises(ValidationError):
+            editar_horario(inativo, "seg", datetime.time(8), datetime.time(12), True)
+        inativo.refresh_from_db()
+        self.assertFalse(inativo.ativo)
+        editar_horario(self.horario, "seg", datetime.time(8), datetime.time(12), False)
+        editar_horario(inativo, "seg", datetime.time(8), datetime.time(12), True)
+        inativo.refresh_from_db()
+        self.assertTrue(inativo.ativo)
+        editar_horario(inativo, "seg", datetime.time(8), datetime.time(12), False)
+        cadastrar_horario(self.quadra, "seg", datetime.time(8), datetime.time(12))
+        self.assertEqual(HorarioFuncionamento.objects.filter(ativo=True).count(), 1)
+
+    def test_interface_exibe_conflito_no_cadastro_e_na_edicao(self):
+        admin = get_user_model().objects.create_user("admin@teste.com", "Administrador", "senha-forte-123", is_staff=True)
+        self.client.force_login(admin)
+        horario = cadastrar_horario(self.quadra, "seg", datetime.time(14), datetime.time(16))
+        dados = {"dia_semana": "seg", "hora_inicio": "09:00", "hora_fim": "11:00", "ativo": "on"}
+        urls = [reverse("quadras:cadastrar_horario", args=[self.quadra.pk]), reverse("quadras:editar_horario", args=[horario.pk])]
+        for url in urls:
+            with self.subTest(url=url):
+                resposta = self.client.post(url, dados)
+                self.assertEqual(resposta.status_code, 200)
+                self.assertContains(resposta, "Já existe um horário ativo que se sobrepõe a este período para a mesma quadra e dia.")
+                self.assertEqual(HorarioFuncionamento.objects.count(), 2)
+                horario.refresh_from_db()
+                self.assertEqual((horario.hora_inicio, horario.hora_fim), (datetime.time(14), datetime.time(16)))
+
+
 class InterfaceGerenciamentoQuadrasTests(TestCase):
     """US10, #34: navegação administrativa e proteção das operações."""
 
