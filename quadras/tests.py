@@ -257,6 +257,21 @@ class ConflitosHorariosTests(TestCase):
         cadastrar_horario(self.quadra, "seg", datetime.time(8), datetime.time(12))
         self.assertEqual(HorarioFuncionamento.objects.filter(ativo=True).count(), 1)
 
+    def test_botao_reativar_recusa_conflito_e_aceita_apos_desativacao(self):
+        admin = get_user_model().objects.create_user("admin@teste.com", "Administrador", "senha-forte-123", is_staff=True)
+        self.client.force_login(admin)
+        inativo = cadastrar_horario(self.quadra, "seg", datetime.time(9), datetime.time(11), False)
+        url = reverse("quadras:reativar_horario", args=[inativo.pk])
+        resposta = self.client.post(url, follow=True)
+        self.assertContains(resposta, "Já existe um horário ativo que se sobrepõe a este período para a mesma quadra e dia.")
+        inativo.refresh_from_db()
+        self.assertFalse(inativo.ativo)
+        self.client.post(reverse("quadras:desativar_horario", args=[self.horario.pk]))
+        resposta = self.client.post(url, follow=True)
+        self.assertRedirects(resposta, reverse("quadras:horarios", args=[self.quadra.pk]))
+        inativo.refresh_from_db()
+        self.assertTrue(inativo.ativo)
+
     def test_interface_exibe_conflito_no_cadastro_e_na_edicao(self):
         admin = get_user_model().objects.create_user("admin@teste.com", "Administrador", "senha-forte-123", is_staff=True)
         self.client.force_login(admin)
