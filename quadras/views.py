@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 from .forms import CadastroQuadraForm, HorarioFuncionamentoForm
 from .models import HorarioFuncionamento, Quadra
 from .services import cadastrar_horario, cadastrar_quadra, desativar_quadra, editar_horario, editar_quadra, reativar_quadra
-from .services import listar_quadras
+from .services import desativar_horario, listar_quadras, reativar_horario
 
 
 def mostrar_erros_no_form(form, erro):
@@ -164,3 +164,35 @@ def editar_horario_view(request, pk):
     else:
         form = HorarioFuncionamentoForm(instance=horario)
     return render(request, "quadras/horario_form.html", {"form": form, "quadra": horario.quadra, "horario": horario, "titulo": "Editar horário"})
+
+
+@require_POST
+def desativar_horario_view(request, pk):
+    """desativa o horario e volta pra lista de horarios da quadra."""
+    bloqueio = exigir_administrador(request)
+    if bloqueio:
+        return bloqueio
+    horario = get_object_or_404(HorarioFuncionamento, pk=pk)
+    try:
+        desativar_horario(horario)
+    except ValidationError as erro:
+        messages.error(request, erro.messages[0])
+    else:
+        messages.success(request, "Horário desativado. Ele não aparece mais para reserva.")
+    return redirect("quadras:horarios", quadra_id=horario.quadra_id)
+
+
+@require_POST
+def reativar_horario_view(request, pk):
+    """reativa o horario e volta pra lista de horarios da quadra."""
+    bloqueio = exigir_administrador(request)
+    if bloqueio:
+        return bloqueio
+    horario = get_object_or_404(HorarioFuncionamento, pk=pk)
+    try:
+        reativar_horario(horario)
+    except ValidationError as erro:
+        messages.error(request, erro.messages[0])
+    else:
+        messages.success(request, "Horário reativado. Ele já pode ser reservado de novo.")
+    return redirect("quadras:horarios", quadra_id=horario.quadra_id)
