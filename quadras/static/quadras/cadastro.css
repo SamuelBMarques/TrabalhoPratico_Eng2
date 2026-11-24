@@ -352,6 +352,18 @@ body {
 .botao-secundario { border-color: var(--roxo); color: var(--roxo); }
 .botao-secundario:hover { background: var(--roxo); color: var(--branco); }
 
+/* botao de desativar ou reativar na mesma linha do horario */
+.form-inline {
+    display: inline-block;
+    margin-left: 8px;
+}
+
+.form-inline .botao-perigo,
+.form-inline .botao-secundario {
+    padding: 4px 10px;
+    font-size: 0.85rem;
+}
+
 /* ---------- celular e tela estreita ---------- */
 
 @media (max-width: 860px) {
