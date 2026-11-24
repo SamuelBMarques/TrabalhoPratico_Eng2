@@ -118,3 +118,21 @@ def editar_horario(horario: HorarioFuncionamento, dia_semana: str, hora_inicio: 
     horario.ativo = ativo
     horario.save()
     return horario
+
+
+def desativar_horario(horario: HorarioFuncionamento) -> HorarioFuncionamento:
+    """desativa o horario sem apagar do banco, assim ele some das reservas."""
+    if not horario.ativo:
+        raise ValidationError("O horário já está desativado.")
+    horario.ativo = False
+    horario.save(update_fields=["ativo"])
+    return horario
+
+
+def reativar_horario(horario: HorarioFuncionamento) -> HorarioFuncionamento:
+    """coloca de volta em uso um horario que estava desativado."""
+    if horario.ativo:
+        raise ValidationError("O horário já está ativo.")
+    horario.ativo = True
+    horario.save(update_fields=["ativo"])
+    return horario
