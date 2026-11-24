@@ -8,6 +8,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from quadras.models import HorarioFuncionamento
 from quadras.services import cadastrar_quadra, desativar_quadra
 
 from .models import Bloqueio, Reserva
@@ -61,6 +62,18 @@ class HorariosDisponiveisTests(TestCase):
 
         self.assertEqual(len(self.listar(quadra, SEGUNDA)), 3)
         self.assertEqual(self.listar(quadra, TERCA), [])
+
+    def test_horario_detalhado_desativado_nao_reaparece_pelo_funcionamento_legado(self):
+        quadra = criar_quadra(dias=["seg"])
+        HorarioFuncionamento.objects.create(
+            quadra=quadra,
+            dia_semana="seg",
+            hora_inicio=hora("08:00"),
+            hora_fim=hora("10:00"),
+            ativo=False,
+        )
+
+        self.assertEqual(self.listar(quadra), [])
 
     def test_quadra_desativada_nao_tem_horario(self):
         quadra = desativar_quadra(criar_quadra())

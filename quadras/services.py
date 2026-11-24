@@ -80,8 +80,7 @@ def listar_quadras() -> QuerySet[Quadra]:
 
 
 def cadastrar_horario(quadra: Quadra, dia_semana: str, hora_inicio: datetime.time, hora_fim: datetime.time, ativo: bool = True) -> HorarioFuncionamento:
-    if hora_fim <= hora_inicio:
-        raise ValidationError({"hora_fim": "O horário de fechamento deve ser depois da abertura."})
+    validar_horario_funcionamento(quadra, dia_semana, hora_inicio, hora_fim, ativo=ativo)
     return HorarioFuncionamento.objects.create(
         quadra=quadra,
         dia_semana=dia_semana,
@@ -92,11 +91,57 @@ def cadastrar_horario(quadra: Quadra, dia_semana: str, hora_inicio: datetime.tim
 
 
 def editar_horario(horario: HorarioFuncionamento, dia_semana: str, hora_inicio: datetime.time, hora_fim: datetime.time, ativo: bool = True) -> HorarioFuncionamento:
-    if hora_fim <= hora_inicio:
-        raise ValidationError({"hora_fim": "O horário de fechamento deve ser depois da abertura."})
+    validar_horario_funcionamento(
+        horario.quadra,
+        dia_semana,
+        hora_inicio,
+        hora_fim,
+        horario_id=horario.pk,
+        ativo=ativo,
+    )
     horario.dia_semana = dia_semana
     horario.hora_inicio = hora_inicio
     horario.hora_fim = hora_fim
     horario.ativo = ativo
     horario.save()
+    return horario
+
+
+def validar_horario_funcionamento(
+    quadra: Quadra,
+    dia_semana: str,
+    hora_inicio: datetime.time,
+    hora_fim: datetime.time,
+    horario_id: int | None = None,
+    ativo: bool = True,
+) -> None:
+    dias_validos = {codigo for codigo, _ in Quadra.DIAS_SEMANA}
+    if dia_semana not in dias_validos:
+        raise ValidationError({"dia_semana": "Selecione um dia da semana válido."})
+    if hora_inicio is None or hora_fim is None:
+        raise ValidationError({"hora_inicio": "Informe os horários de início e fim."})
+    if hora_fim <= hora_inicio:
+        raise ValidationError({"hora_fim": "O horário de fechamento deve ser depois da abertura."})
+
+    if not ativo:
+        return
+
+    conflitantes = HorarioFuncionamento.objects.filter(
+        quadra=quadra,
+        dia_semana=dia_semana,
+        ativo=True,
+        hora_inicio__lt=hora_fim,
+        hora_fim__gt=hora_inicio,
+    )
+    if horario_id is not None:
+        conflitantes = conflitantes.exclude(pk=horario_id)
+    if conflitantes.exists():
+        raise ValidationError({"hora_inicio": "Este horário se sobrepõe a outro horário ativo da quadra."})
+
+
+def desativar_horario(horario: HorarioFuncionamento) -> HorarioFuncionamento:
+    if not horario.ativo:
+        raise ValidationError("Este horário já está desativado.")
+    horario.ativo = False
+    horario.save(update_fields=["ativo"])
     return horario

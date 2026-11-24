@@ -6,26 +6,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Horários de {{ quadra.nome }} | Reserva de Quadras</title>
     <link rel="stylesheet" href="{% static 'quadras/cadastro.css' %}">
+    <link rel="stylesheet" href="{% static 'quadras/horarios.css' %}">
 </head>
 <body>
     <main class="painel simples">
         <a href="{% url 'quadras:editar' quadra.pk %}">← Voltar para a quadra</a>
         <span class="passo">H11 · Horários</span>
         <h1>{{ quadra.nome }}</h1>
-        {% for message in messages %}<div class="aviso aviso-sucesso"><p>{{ message }}</p></div>{% endfor %}
+        {% for message in messages %}
+            <div class="aviso {% if message.tags == 'error' %}aviso-erro{% else %}aviso-sucesso{% endif %}" role="status"><p>{{ message }}</p></div>
+        {% endfor %}
         <a class="botao" href="{% url 'quadras:cadastrar_horario' quadra.pk %}">Cadastrar horário</a>
         {% if horarios %}
-            <ul>
+            <ul class="lista-horarios">
                 {% for horario in horarios %}
-                    <li>
-                        {{ horario.get_dia_semana_display }}: {{ horario.hora_inicio|time:"H:i" }} às {{ horario.hora_fim|time:"H:i" }}
-                        {% if not horario.ativo %}(inativo){% endif %}
-                        <a href="{% url 'quadras:editar_horario' horario.pk %}">Editar</a>
+                    <li class="horario-item">
+                        <div class="horario-detalhe">
+                            <strong>{{ horario.get_dia_semana_display }}</strong>
+                            <span>{{ horario.hora_inicio|time:"H:i" }} às {{ horario.hora_fim|time:"H:i" }}</span>
+                        </div>
+                        <span class="etiqueta {% if horario.ativo %}etiqueta-ativa{% else %}etiqueta-inativa{% endif %}">
+                            {% if horario.ativo %}Ativo{% else %}Desativado{% endif %}
+                        </span>
+                        <div class="acoes-horario">
+                            <a class="botao-secundario" href="{% url 'quadras:editar_horario' horario.pk %}">Editar</a>
+                            {% if horario.ativo %}
+                                <form method="post" action="{% url 'quadras:desativar_horario' horario.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="botao-perigo">Desativar</button>
+                                </form>
+                            {% endif %}
+                        </div>
                     </li>
                 {% endfor %}
             </ul>
         {% else %}
-            <p>Nenhum horário detalhado cadastrado para esta quadra.</p>
+            <div class="vazio"><h2>Nenhum horário cadastrado</h2><p>Adicione o primeiro horário de funcionamento desta quadra.</p></div>
         {% endif %}
     </main>
 </body>

@@ -14,4 +14,5 @@ urlpatterns = [
     path("<int:quadra_id>/horarios/", views.horarios, name="horarios"),
     path("<int:quadra_id>/horarios/cadastro/", views.cadastrar_horario_view, name="cadastrar_horario"),
     path("horarios/<int:pk>/editar/", views.editar_horario_view, name="editar_horario"),
+    path("horarios/<int:pk>/desativar/", views.desativar_horario_view, name="desativar_horario"),
 ]

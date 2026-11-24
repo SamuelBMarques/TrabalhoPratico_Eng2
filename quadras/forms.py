@@ -2,8 +2,10 @@
 import datetime
 
 from django import forms
+from django.core.exceptions import ValidationError
 
 from .models import HorarioFuncionamento, Quadra
+from .services import validar_horario_funcionamento
 
 
 class CadastroQuadraForm(forms.Form):
@@ -37,10 +39,28 @@ class HorarioFuncionamentoForm(forms.ModelForm):
             "hora_fim": forms.TimeInput(attrs={"type": "time"}, format="%H:%M"),
         }
 
+    def __init__(self, *args, quadra=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.quadra = quadra or getattr(self.instance, "quadra", None)
+
     def clean(self):
         dados = super().clean()
         inicio = dados.get("hora_inicio")
         fim = dados.get("hora_fim")
-        if inicio and fim and fim <= inicio:
-            self.add_error("hora_fim", "O horário de fechamento deve ser depois da abertura.")
+        dia = dados.get("dia_semana")
+        ativo = dados.get("ativo", True)
+        if self.quadra and inicio and fim and dia:
+            try:
+                validar_horario_funcionamento(
+                    self.quadra,
+                    dia,
+                    inicio,
+                    fim,
+                    horario_id=self.instance.pk,
+                    ativo=ativo,
+                )
+            except ValidationError as erro:
+                for campo, mensagens in erro.message_dict.items():
+                    for mensagem in mensagens:
+                        self.add_error(campo, mensagem)
         return dados
