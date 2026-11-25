@@ -79,7 +79,7 @@ def listar_quadras() -> QuerySet[Quadra]:
     return Quadra.objects.order_by("-ativa", Lower("nome"))
 
 
-def validar_dados_horario(dia_semana: str, hora_inicio: datetime.time, hora_fim: datetime.time) -> dict:
+def validar_dados_horario(quadra: Quadra, dia_semana: str, hora_inicio: datetime.time, hora_fim: datetime.time, ativo: bool = True, horario_id: int | None = None) -> dict:
     """valida os dados de funcionamento, usado no cadastro e na edicao."""
     if dia_semana not in dict(Quadra.DIAS_SEMANA):
         raise ValidationError({"dia_semana": "Escolha um dia da semana válido."})
@@ -89,11 +89,21 @@ def validar_dados_horario(dia_semana: str, hora_inicio: datetime.time, hora_fim:
         raise ValidationError({"hora_fim": "Informe um horário de fim válido."})
     if hora_fim <= hora_inicio:
         raise ValidationError({"hora_fim": "O horário de fechamento deve ser depois da abertura."})
+    if ativo:
+        conflitos = HorarioFuncionamento.objects.filter(
+            quadra=quadra, dia_semana=dia_semana, ativo=True,
+            hora_inicio__lt=hora_fim, hora_fim__gt=hora_inicio,
+        )
+        # na edicao o proprio horario nao conta como conflito
+        if horario_id is not None:
+            conflitos = conflitos.exclude(pk=horario_id)
+        if conflitos.exists():
+            raise ValidationError({"hora_inicio": "Já existe um horário ativo que se sobrepõe a este período para a mesma quadra e dia."})
     return {"dia_semana": dia_semana, "hora_inicio": hora_inicio, "hora_fim": hora_fim}
 
 
 def cadastrar_horario(quadra: Quadra, dia_semana: str, hora_inicio: datetime.time, hora_fim: datetime.time, ativo: bool = True) -> HorarioFuncionamento:
-    dados = validar_dados_horario(dia_semana, hora_inicio, hora_fim)
+    dados = validar_dados_horario(quadra, dia_semana, hora_inicio, hora_fim, ativo)
     return HorarioFuncionamento.objects.create(
         quadra=quadra,
         ativo=ativo,
@@ -102,7 +112,7 @@ def cadastrar_horario(quadra: Quadra, dia_semana: str, hora_inicio: datetime.tim
 
 
 def editar_horario(horario: HorarioFuncionamento, dia_semana: str, hora_inicio: datetime.time, hora_fim: datetime.time, ativo: bool = True) -> HorarioFuncionamento:
-    dados = validar_dados_horario(dia_semana, hora_inicio, hora_fim)
+    dados = validar_dados_horario(horario.quadra, dia_semana, hora_inicio, hora_fim, ativo, horario.pk)
     for campo, valor in dados.items():
         setattr(horario, campo, valor)
     horario.ativo = ativo
@@ -123,6 +133,7 @@ def reativar_horario(horario: HorarioFuncionamento) -> HorarioFuncionamento:
     """coloca de volta em uso um horario que estava desativado."""
     if horario.ativo:
         raise ValidationError("O horário já está ativo.")
+    validar_dados_horario(horario.quadra, horario.dia_semana, horario.hora_inicio, horario.hora_fim, True, horario.pk)
     horario.ativo = True
     horario.save(update_fields=["ativo"])
     return horario
