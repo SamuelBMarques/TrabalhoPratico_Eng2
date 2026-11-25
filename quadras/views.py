@@ -126,8 +126,18 @@ def horarios(request, quadra_id):
     if bloqueio:
         return bloqueio
     quadra = get_object_or_404(Quadra, pk=quadra_id)
-    horarios = quadra.horarios_funcionamento.all()
-    return render(request, "quadras/horarios.html", {"quadra": quadra, "horarios": horarios})
+    horarios = list(quadra.horarios_funcionamento.order_by("hora_inicio"))
+    dias = []
+    for codigo, nome in Quadra.DIAS_SEMANA:
+        periodos = [horario for horario in horarios if horario.dia_semana == codigo]
+        dias.append({
+            "nome": nome, "horarios": periodos,
+            "usa_geral": not periodos and codigo in quadra.dias_funcionamento,
+            "fechado": bool(periodos) and not any(horario.ativo for horario in periodos),
+        })
+    return render(request, "quadras/horarios.html", {
+        "quadra": quadra, "horarios": horarios, "dias": dias,
+    })
 
 
 @login_required

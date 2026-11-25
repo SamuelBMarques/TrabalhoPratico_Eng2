@@ -32,6 +32,12 @@ class HorarioFuncionamentoForm(forms.ModelForm):
     class Meta:
         model = HorarioFuncionamento
         fields = ["dia_semana", "hora_inicio", "hora_fim", "ativo"]
+        labels = {
+            "dia_semana": "Dia da semana",
+            "hora_inicio": "Abre às",
+            "hora_fim": "Fecha às",
+            "ativo": "Horário ativo",
+        }
         widgets = {
             "hora_inicio": forms.TimeInput(attrs={"type": "time"}, format="%H:%M"),
             "hora_fim": forms.TimeInput(attrs={"type": "time"}, format="%H:%M"),
